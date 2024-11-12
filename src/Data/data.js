@@ -7,7 +7,7 @@ const cvd = [
       heading: "YOGA SESSIONS",
       title: "CISKA YOUTH SOCIAL TRUST",
       text: "Yoga sessions are also available. These sessions aim to promote relaxation and improve overall well-being through a series of guided poses and breathing exercises. Participants will experience enhanced flexibility, relief from muscle tension, and improved energy flow throughout the body.",
-      btn: "Explore More",
+      btn: "Predict",
       linkpath: "/Home/Predictor",
       img: Heart,
     },
