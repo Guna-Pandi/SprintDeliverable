@@ -1,26 +1,25 @@
-import  Heart from "../assets/Heart.png"
-import Dashboard from "../assets/Dashboard.png"
+import Heart from "../assets/Heart.png";
+import Dashboard from "../assets/Dashboard.png";
 
 const cvd = [
-    {
-      id: 1,
-      heading: "YOGA SESSIONS",
-      title: "CISKA YOUTH SOCIAL TRUST",
-      text: "Yoga sessions are also available. These sessions aim to promote relaxation and improve overall well-being through a series of guided poses and breathing exercises. Participants will experience enhanced flexibility, relief from muscle tension, and improved energy flow throughout the body.",
-      btn: "Predict",
-      linkpath: "/Home/Predictor",
-      img: Heart,
-    },
-    {
-      id: 2,
-      heading: "KARATE SESSIONS",
-      title: "CISKA YOUTH SOCIAL TRUST",
-      text: "Karate sessions are being held for students at Ondipudur. These sessions aim to enhance discipline, focus, and physical fitness in young minds. Students will develop confidence, self-defense skills, and mental strength, contributing to their overall well-being and personal growth.",
-      btn: "Explore More",
-      linkpath: "/Home/Dashboard",
-      img: Dashboard,
-    },
-    
-  ];
+  {
+    id: 1,
+    heading: "CVD RISK PREDICTION",
+    title: "MU-SIGMA PVT LTD",
+    text: "Our CVD Risk Prediction App is designed to help individuals assess their risk of cardiovascular disease (CVD) and make informed decisions about their health. Using advanced data analysis and health metrics, the app evaluates key factors such as blood pressure, cholesterol levels, lifestyle choices to estimate each user's CVD risk.",
+    btn: "Predict",
+    linkpath: "/Home/Predictor",
+    img: Heart,
+  },
+  {
+    id: 2,
+    heading: "CVD RISK DASHBOARD",
+    title: "MU-SIGMA PVT LTD",
+    text: "The CVD Risk Dashboard is an interactive tool designed to provide users with a clear, real-time overview of their cardiovascular health. With data visualizations and easy-to-read metrics, the dashboard offers users insights into their CVD risk profile by displaying key health indicators, such as blood pressure, cholesterol levels, heart rate, and lifestyle habits. Using this each user can track their progress over time, identify trends, and receive alerts when certain health metrics require attention",
+    btn: "Dashboard",
+    linkpath: "/Home/Dashboard",
+    img: Dashboard,
+  },
+];
 
-  export {cvd};
+export { cvd };
