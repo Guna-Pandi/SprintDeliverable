@@ -95,10 +95,10 @@ const SmokingStatusStackedChart = ({ data }) => {
   };
 
   useEffect(() => {
-    // Cleanup the chart if the component is unmounted
+    const chartInstance = chartRef.current;
     return () => {
-      if (chartRef.current) {
-        chartRef.current.destroy();  // Ensure chartRef.current is not null before calling destroy
+      if (chartInstance) {
+        chartInstance.destroy();
       }
     };
   }, []);
@@ -115,7 +115,7 @@ const SmokingStatusStackedChart = ({ data }) => {
         >
           Diagnosis Count by Smoking Status
         </Typography>
-        <div className="h-[350px] p-5 relative">
+        <div className="chartcard">
           <Bar data={chartData} options={chartOptions} ref={chartRef} />
         </div>
       </CardContent>

@@ -75,11 +75,10 @@ const AgeBarChart = ({ data }) => {
   };
 
   useEffect(() => {
-    return () => {
-      if (chartRef.current) {
-        chartRef.current.destroy();
-      }
-    };
+    const chartInstance = chartRef.current; 
+    if (chartInstance) {
+      chartInstance.destroy();
+    }
   }, []);
 
   return (
@@ -94,7 +93,7 @@ const AgeBarChart = ({ data }) => {
         >
           Patient Count by Age Range
         </Typography>
-        <div className="h-[350px] p-5 relative">
+        <div className="chartcard">
           <Bar data={chartData} options={chartOptions} ref={chartRef} />
         </div>
       </CardContent>

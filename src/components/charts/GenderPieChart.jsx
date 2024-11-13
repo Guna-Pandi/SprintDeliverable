@@ -28,7 +28,7 @@ const GenderPieChart = ({ data }) => {
         <Typography variant="h6" component="div" gutterBottom className="text-center text-gray-800">
           Gender Distribution
         </Typography>
-        <div className="h-[350px] p-5 relative">
+        <div className="chartcard">
           <Pie data={chartData} options={{ maintainAspectRatio: false }} />
         </div>
       </CardContent>

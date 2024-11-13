@@ -23,12 +23,10 @@ ChartJS.register(
 const DiagnosisStackedChart = ({ data }) => {
   const chartRef = useRef(null);
 
-  // Helper function to classify systolic BP as High or Low
   const classifySystolicBP = (systolic) => {
     return systolic >= 140 ? "High" : "Low";
   };
 
-  // Group data by systolic BP classification (High/Low) and diagnosis
   const diagnosisCounts = data.reduce((acc, curr) => {
     const bpCategory = classifySystolicBP(curr.systolic_bp);
     const diagnosis = curr.diagnosis;
@@ -42,12 +40,11 @@ const DiagnosisStackedChart = ({ data }) => {
     return acc;
   }, {});
 
-  // Prepare chart data
   const labels = Object.keys(diagnosisCounts);
-  const diagnosisTypes = ["coronary artery disease", "hypertension", "other"]; // Example diagnosis categories
+  const diagnosisTypes = ["coronary artery disease", "hypertension", "other"]; 
   
   const chartData = {
-    labels: labels, // High, Low
+    labels: labels, 
     datasets: diagnosisTypes.map((diagnosis) => ({
       label: diagnosis,
       data: labels.map((label) => diagnosisCounts[label]?.[diagnosis] || 0),
@@ -84,9 +81,10 @@ const DiagnosisStackedChart = ({ data }) => {
   };
 
   useEffect(() => {
+    const chartInstance = chartRef.current;
     return () => {
-      if (chartRef.current) {
-        chartRef.current.destroy();
+      if (chartInstance) {
+        chartInstance.destroy();
       }
     };
   }, []);
@@ -103,7 +101,7 @@ const DiagnosisStackedChart = ({ data }) => {
         >
           Diagnosis Count by Systolic BP 
         </Typography>
-        <div className="h-[350px] p-5 relative">
+        <div className="chartcard">
           <Bar data={chartData} options={chartOptions} ref={chartRef} />
         </div>
       </CardContent>

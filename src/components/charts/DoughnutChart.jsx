@@ -34,7 +34,7 @@ const DoughnutChart = ({ data }) => {
         >
           Patient Count by Diagnosis
         </Typography>
-        <div className="h-[350] p-5 relative">
+        <div className="chartcard">
           <Doughnut data={chartData} />
         </div>
       </CardContent>
