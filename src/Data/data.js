@@ -15,7 +15,7 @@ const cvd = [
     id: 2,
     heading: "CVD RISK",
     title: "DASHBOARD",
-    text: "The CVD Risk Dashboard is an interactive tool designed to provide users with a clear, real-time overview of their cardiovascular health. With data visualizations and easy-to-read metrics, the dashboard offers users insights into their CVD risk profile by displaying key health indicators, such as blood pressure, cholesterol levels, heart rate, and lifestyle habits. Using this each user can track their progress over time, identify trends, and receive alerts when certain health metrics require attention",
+    text: "The CVD Risk Dashboard is an interactive tool designed to provide users with a clear, real-time overview of their cardiovascular health. With data visualizations and easy-to-read metrics, the dashboard offers users insights into their CVD risk profile by displaying key health indicators, such as blood pressure, cholesterol levels, heart rate, and lifestyle habits. Using this each user can track their progress over time, identify trends, and receive alerts when certain health metrics require attention.",
     btn: "Dashboard",
     linkpath: "/Home/Dashboard",
     img: Dashboard,

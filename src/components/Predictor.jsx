@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { HiHome } from "react-icons/hi2";
+import { Link } from "react-router-dom";
 
 const Predictor = () => {
   const [inputs, setInputs] = useState({
@@ -11,7 +13,7 @@ const Predictor = () => {
     hdl: "",
     bmi: "",
   });
-  
+
   const [errors, setErrors] = useState({});
 
   const ranges = {
@@ -38,7 +40,11 @@ const Predictor = () => {
     const numericValue = parseInt(value, 10);
 
     // Validate input on blur to check if within the range
-    if (!isNaN(numericValue) && numericValue >= ranges[id][0] && numericValue <= ranges[id][1]) {
+    if (
+      !isNaN(numericValue) &&
+      numericValue >= ranges[id][0] &&
+      numericValue <= ranges[id][1]
+    ) {
       setErrors((prevErrors) => ({
         ...prevErrors,
         [id]: "",
@@ -53,12 +59,21 @@ const Predictor = () => {
 
   return (
     <div className="mb-11 relative">
-      <h1 className="fixed top-0 left-0 right-0 h-[9vh] flex font-extrabold text-white text-3xl items-center justify-center opacity-100 z-[200] blur-effect-theme">
-        Cardiovascular Disease Risk Predictor
+      <h1 className="fixed top-0 left-0 right-0 h-[9vh] flex items-center justify-center md:justify-center font-extrabold text-white text-3xl opacity-100 z-[100] blur-effect-theme">
+        <div className="absolute top-1/2 transform -translate-y-1/2 left-5 md:hidden text-3xl cursor-pointer ">
+          <Link to="/">
+            <HiHome className="hover:scale-90" />
+          </Link>
+        </div>
+        <span className="text-center">
+          Cardiovascular Disease Risk Predictor
+        </span>
       </h1>
+
       <h1 className="flex justify-center items-center font-semibold text-2xl mt-24 mb-5 text-gray-900">
         Please Fill Your Health Metrics
       </h1>
+
       <div className="flex justify-center items-center">
         <div className="w-full max-w-2xl px-6 py-10 bg-white rounded-lg shadow-2xl ">
           <form>
@@ -83,7 +98,9 @@ const Predictor = () => {
                       placeholder={`${ranges[field][0]}-${ranges[field][1]}`}
                       required
                     />
-                    {errors[field] && <p className="text-red-500 text-sm">{errors[field]}</p>}
+                    {errors[field] && (
+                      <p className="text-red-500 text-sm">{errors[field]}</p>
+                    )}
                   </div>
                 </div>
               ))}
@@ -106,14 +123,16 @@ const Predictor = () => {
                 </select>
               </div>
             </div>
-            <div className="flex justify-center">
-              <button
-                type="submit"
-                className="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-1/2 flex justify-center items-center px-5 py-2.5"
-              >
-                Predict
-              </button>
-            </div>
+            <Link to="/Home/Predictor/ResultPredict">
+              <div className="flex justify-center">
+                <button
+                  type="submit"
+                  className="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-1/2 flex justify-center items-center px-5 py-2.5"
+                >
+                  Predict
+                </button>
+              </div>
+            </Link>
           </form>
         </div>
       </div>
