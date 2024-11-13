@@ -23,12 +23,12 @@ const Dashboard = () => {
         </span>
       </h1>
     <div className="p-5 grid gap-8 mt-28 sm:grid-cols-1 md:grid-cols-2 ">
-      <div className="flex flex-row md:flex-col sm:flex-col items-center gap-7 overflow-auto">
+      <div className="flex flex-row md:flex-col sm:flex-col items-center gap-7 overflow-hidden">
         <GenderPieChart data={patientData} />
         <DiagnosisStackedChart data={patientData} />
         <PhysicalActivityPieChart data={patientData} />
       </div>
-      <div className="flex flex-row md:flex-col sm:flex-col items-center gap-7 overflow-auto">
+      <div className="flex flex-row md:flex-col sm:flex-col items-center gap-7 overflow-hidden">
         <AgeBarChart data={patientData} />
         <SmokingStatusStackedChart data={patientData} />
         <DoughnutChart data={patientData} />
