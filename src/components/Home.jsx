@@ -4,10 +4,9 @@ import { Link } from "react-router-dom";
 const Home = ({ endpoint = [] }) => {
   return (
     <div className="mb-11 relative">
-       <h1 className="fixed top-0 left-0 right-0 h-[9vh] flex items-center justify-center text-center font-extrabold text-white text-3xl opacity-100 z-[100] blur-effect-theme">
-  Cardiovascular Disease Risk Predictor
-</h1>
-
+      <h1 className="fixed top-0 left-0 right-0 h-[9vh] flex items-center justify-center text-center font-extrabold text-white text-3xl opacity-100 z-[100] blur-effect-theme">
+        Cardiovascular Disease Risk Predictor
+      </h1>
       {endpoint.map(({ id, heading, title, text, img, btn, linkpath }) => (
         <div
           key={id}

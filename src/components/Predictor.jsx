@@ -54,8 +54,11 @@ const Predictor = () => {
     }));
 
     // Validate input on each change
-    if (ranges[id] && (!isNaN(numericValue) && 
-        (numericValue < ranges[id][0] || numericValue > ranges[id][1]))) {
+    if (
+      ranges[id] &&
+      !isNaN(numericValue) &&
+      (numericValue < ranges[id][0] || numericValue > ranges[id][1])
+    ) {
       setErrors((prevErrors) => ({
         ...prevErrors,
         [id]: `Please enter a value between ${ranges[id][0]} and ${ranges[id][1]}.`,
