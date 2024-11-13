@@ -36,7 +36,9 @@ const Home = ({ endpoint = [] }) => {
             <img
               src={img}
               alt={`img/${heading}`}
-              className="w-auto object-fill transitions-theme h-80 lg:h-64 md:h-60 sm:h-48 xsm:h-40 hover:scale-110"
+              className={`w-auto object-fill h-80 lg:h-64 md:h-60 sm:h-48 xsm:h-40 ${
+                id % 2 !== 0 ? "animate-scaleUpDown" : ""
+              }`}
             />
           </div>
         </div>
