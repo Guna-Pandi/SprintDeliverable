@@ -19,6 +19,9 @@ const ResultPredict = () => {
           Cardiovascular Disease Risk Predictor
         </span>
       </h1>
+      <div>
+        {/* display the entered */}
+      </div>
     </div>
   );
 };
