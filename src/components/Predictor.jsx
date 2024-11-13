@@ -46,29 +46,24 @@ const Predictor = () => {
 
   const handleChange = (e) => {
     const { id, value } = e.target;
+    const numericValue = parseInt(value, 10);
+
     setInputs((prevInputs) => ({
       ...prevInputs,
       [id]: value,
     }));
-  };
 
-  const handleBlur = (e) => {
-    const { id, value } = e.target;
-    const numericValue = parseInt(value, 10);
-
-    if (
-      !isNaN(numericValue) &&
-      numericValue >= ranges[id][0] &&
-      numericValue <= ranges[id][1]
-    ) {
+    // Validate input on each change
+    if (ranges[id] && (!isNaN(numericValue) && 
+        (numericValue < ranges[id][0] || numericValue > ranges[id][1]))) {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        [id]: "",
+        [id]: `Please enter a value between ${ranges[id][0]} and ${ranges[id][1]}.`,
       }));
     } else {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        [id]: `Please enter a value between ${ranges[id][0]} and ${ranges[id][1]}.`,
+        [id]: "",
       }));
     }
   };
@@ -78,6 +73,10 @@ const Predictor = () => {
     setFormData(inputs);
     navigate("/Home/Predictor/ResultPredict");
   };
+
+  const isFormValid =
+    Object.values(errors).every((error) => error === "") &&
+    Object.values(inputs).every((input) => input !== "");
 
   return (
     <div className="mb-11 relative">
@@ -128,7 +127,6 @@ const Predictor = () => {
                       id={field}
                       value={inputs[field]}
                       onChange={handleChange}
-                      onBlur={handleBlur}
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                       placeholder={`${ranges[field][0]}-${ranges[field][1]}`}
                       required
@@ -143,7 +141,10 @@ const Predictor = () => {
             <div className="flex justify-center">
               <button
                 type="submit"
-                className="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-1/2 flex justify-center items-center px-5 py-2.5"
+                className={`text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-1/2 flex justify-center items-center px-5 py-2.5 ${
+                  !isFormValid ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={!isFormValid}
               >
                 Predict
               </button>
