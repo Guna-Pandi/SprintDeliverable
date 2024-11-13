@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { FormContext } from "../FormContext";
 import { HiHome } from "react-icons/hi2";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Predictor = () => {
+  const { setFormData } = useContext(FormContext);
+  const navigate = useNavigate();
+
   const [inputs, setInputs] = useState({
     sbp: "",
     ldl: "",
@@ -12,19 +16,32 @@ const Predictor = () => {
     bs: "",
     hdl: "",
     bmi: "",
+    smoke: "",
   });
 
   const [errors, setErrors] = useState({});
 
   const ranges = {
-    Systolic_Blood_Pressure: [90, 180],
-    LDL_Cholesterol: [50, 190],
-    Diastolic_Blood_Pressure: [60, 110],
-    Triglycerides: [50, 500],
-    Total_Cholesterol: [100, 300],
-    Blood_Sugar: [70, 200],
-    HDL_Cholesterol: [20, 100],
-    Body_Mass_Index: [10, 60],
+    sbp: [90, 180],
+    ldl: [50, 190],
+    dbp: [60, 110],
+    tgc: [50, 500],
+    tc: [100, 300],
+    bs: [70, 200],
+    hdl: [20, 100],
+    bmi: [10, 60],
+  };
+
+  const fieldLabels = {
+    sbp: "Systolic Blood Pressure",
+    ldl: "LDL Cholesterol",
+    dbp: "Diastolic Blood Pressure",
+    tgc: "Triglycerides",
+    tc: "Total Cholesterol",
+    bs: "Blood Sugar",
+    hdl: "HDL Cholesterol",
+    bmi: "Body Mass Index",
+    smoke: "Smoking Status",
   };
 
   const handleChange = (e) => {
@@ -39,7 +56,6 @@ const Predictor = () => {
     const { id, value } = e.target;
     const numericValue = parseInt(value, 10);
 
-    // Validate input on blur to check if within the range
     if (
       !isNaN(numericValue) &&
       numericValue >= ranges[id][0] &&
@@ -55,6 +71,12 @@ const Predictor = () => {
         [id]: `Please enter a value between ${ranges[id][0]} and ${ranges[id][1]}.`,
       }));
     }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setFormData(inputs);
+    navigate("/Home/Predictor/ResultPredict");
   };
 
   return (
@@ -76,18 +98,31 @@ const Predictor = () => {
 
       <div className="flex justify-center items-center">
         <div className="w-full max-w-2xl px-6 py-10 bg-white rounded-lg shadow-2xl ">
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="grid gap-6 mb-6 grid-cols-2">
-              {Object.keys(ranges).map((field) => (
+              {Object.keys(inputs).map((field) => (
                 <div key={field}>
                   <label
                     htmlFor={field}
                     className="block mb-2 text-sm font-medium text-gray-900"
                   >
-                    {field.replaceAll("_", " ")}
+                    {fieldLabels[field]}
                     <span className="text-red-700">*</span>
                   </label>
-                  <div>
+                  {field === "smoke" ? (
+                    <select
+                      id="smoke"
+                      value={inputs.smoke}
+                      onChange={handleChange}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5"
+                      required
+                    >
+                      <option value="">Select</option>
+                      <option value="Non-Smoker">Non-Smoker</option>
+                      <option value="Occasional">Occasional</option>
+                      <option value="Regular">Regular</option>
+                    </select>
+                  ) : (
                     <input
                       type="text"
                       id={field}
@@ -98,41 +133,21 @@ const Predictor = () => {
                       placeholder={`${ranges[field][0]}-${ranges[field][1]}`}
                       required
                     />
-                    {errors[field] && (
-                      <p className="text-red-500 text-sm">{errors[field]}</p>
-                    )}
-                  </div>
+                  )}
+                  {errors[field] && (
+                    <p className="text-red-500 text-sm">{errors[field]}</p>
+                  )}
                 </div>
               ))}
-              <div>
-                <label
-                  htmlFor="smoke"
-                  className="block mb-2 text-sm font-medium text-gray-900"
-                >
-                  Smoking Status<span className="text-red-700">*</span>
-                </label>
-                <select
-                  id="smoke"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-500 focus:border-gray-500 block w-full p-2.5"
-                  required
-                >
-                  <option value="">Select</option>
-                  <option value="non">Non-Smoker</option>
-                  <option value="occ">Occasional</option>
-                  <option value="reg">Regular</option>
-                </select>
-              </div>
             </div>
-            <Link to="/Home/Predictor/ResultPredict">
-              <div className="flex justify-center">
-                <button
-                  type="submit"
-                  className="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-1/2 flex justify-center items-center px-5 py-2.5"
-                >
-                  Predict
-                </button>
-              </div>
-            </Link>
+            <div className="flex justify-center">
+              <button
+                type="submit"
+                className="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-1/2 flex justify-center items-center px-5 py-2.5"
+              >
+                Predict
+              </button>
+            </div>
           </form>
         </div>
       </div>
