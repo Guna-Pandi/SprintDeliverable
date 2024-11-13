@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { Bar } from "react-chartjs-2";
 import { Card, CardContent, Typography } from "@mui/material";
 import {
@@ -21,8 +21,7 @@ ChartJS.register(
 );
 
 const AgeBarChart = ({ data }) => {
-  const chartRef = useRef(null);
-
+  // Function to categorize ages into ranges
   const getAgeRange = (age) => {
     if (age >= 0 && age <= 30) return "0-30";
     if (age >= 31 && age <= 40) return "31-40";
@@ -34,12 +33,14 @@ const AgeBarChart = ({ data }) => {
     return "90+";
   };
 
+  // Count patients by age range
   const ageCounts = data.reduce((acc, curr) => {
     const ageRange = getAgeRange(curr.age);
     acc[ageRange] = (acc[ageRange] || 0) + 1;
     return acc;
   }, {});
 
+  // Chart data and configuration
   const chartData = {
     labels: Object.keys(ageCounts),
     datasets: [
@@ -74,13 +75,6 @@ const AgeBarChart = ({ data }) => {
     },
   };
 
-  useEffect(() => {
-    const chartInstance = chartRef.current; 
-    if (chartInstance) {
-      chartInstance.destroy();
-    }
-  }, []);
-
   return (
     <Card>
       <CardContent>
@@ -93,8 +87,8 @@ const AgeBarChart = ({ data }) => {
         >
           Patient Count by Age Range
         </Typography>
-        <div className="chartcard">
-          <Bar data={chartData} options={chartOptions} ref={chartRef} />
+        <div className="chartcard" style={{ height: 400 }}>
+          <Bar data={chartData} options={chartOptions} />
         </div>
       </CardContent>
     </Card>
