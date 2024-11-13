@@ -9,7 +9,7 @@ body {
 
  /* Blur-Effect */
  .blur-effect-theme {
-  @apply bg-red-900 bg-clip-padding backdrop-filter backdrop-blur-sm  z-[100] shadow-sm shadow-red-900 transition-all duration-300;
+  @apply bg-red-600/80 bg-clip-padding backdrop-filter backdrop-blur-sm opacity-100   z-[100] shadow-lg  shadow-red-500 transition-all duration-300;
 
 }
 .button-theme {
