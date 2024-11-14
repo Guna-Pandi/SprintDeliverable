@@ -41,15 +41,14 @@ const DiagnosisStackedChart = ({ data }) => {
   }, {});
 
   const labels = Object.keys(diagnosisCounts);
-  const diagnosisTypes = ["coronary artery disease", "hypertension", "other"]; 
+  const diagnosisTypes = ["coronary artery disease", "hypertension","stroke", "other"]; 
   
   const chartData = {
     labels: labels, 
     datasets: diagnosisTypes.map((diagnosis) => ({
       label: diagnosis,
       data: labels.map((label) => diagnosisCounts[label]?.[diagnosis] || 0),
-      backgroundColor: diagnosis === "coronary artery disease" ? "#FF5733" :
-                        diagnosis === "hypertension" ? "#33FF57" : "#3357FF",
+      backgroundColor: diagnosis === "coronary artery disease" ? "#FF5733" :  diagnosis === "hypertension" ? "#33FF57" :diagnosis === "stroke" ? "#3357FF": "#28A745",
     })),
   };
 

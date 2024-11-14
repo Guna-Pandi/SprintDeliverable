@@ -17,7 +17,7 @@ const DoughnutChart = ({ data }) => {
     datasets: [
       {
         data: Object.values(diagnosisCount),
-        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
+        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56","#28A745"],
       },
     ],
   };
