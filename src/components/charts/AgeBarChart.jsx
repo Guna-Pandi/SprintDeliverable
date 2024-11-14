@@ -14,8 +14,17 @@ import {
 ChartJS.register(CategoryScale, BarElement, Title, Tooltip, Legend, LinearScale);
 
 const AgeBarChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
-  // Parse selectedAgeRange (e.g., "31-40") to get min and max age values
-  const [minAge, maxAge] = selectedAgeRange.split("-").map(Number);
+  // Define age ranges
+  const ageRanges = [
+    "0-30",
+    "31-40",
+    "41-50",
+    "51-60",
+    "61-70",
+    "71-80",
+    "81-90",
+    "90+",
+  ];
 
   // Function to categorize ages into predefined ranges
   const getAgeRange = (age) => {
@@ -29,12 +38,29 @@ const AgeBarChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
     return "90+";
   };
 
+  // Handle 'all' selectedAgeRange
+  const filterData = (data) => {
+    if (selectedAgeRange === "all") {
+      return data.filter(
+        (patient) =>
+          selectedDiagnosis === "all" || patient.diagnosis === selectedDiagnosis
+      );
+    } else {
+      // Parse selectedAgeRange to get min and max values
+      const [minAge, maxAge] = selectedAgeRange.split("-").map(Number);
+
+      return data.filter(
+        (patient) =>
+          patient.age >= minAge &&
+          patient.age <= maxAge &&
+          (selectedDiagnosis === "all" ||
+            patient.diagnosis === selectedDiagnosis)
+      );
+    }
+  };
+
   // Filter data based on selected age range and diagnosis
-  const filteredData = data.filter((patient) => {
-    const withinAgeRange = patient.age >= minAge && patient.age <= maxAge;
-    const matchesDiagnosis = selectedDiagnosis === "all" || patient.diagnosis === selectedDiagnosis;
-    return withinAgeRange && matchesDiagnosis;
-  });
+  const filteredData = filterData(data);
 
   // Count patients by age range within the filtered data
   const ageCounts = filteredData.reduce((acc, curr) => {
@@ -45,11 +71,11 @@ const AgeBarChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
 
   // Chart data and configuration
   const chartData = {
-    labels: Object.keys(ageCounts),
+    labels: ageRanges,
     datasets: [
       {
         label: "Number of Patients",
-        data: Object.values(ageCounts),
+        data: ageRanges.map((range) => ageCounts[range] || 0), // Handle missing age range counts
         backgroundColor: "#4e73df",
         hoverBackgroundColor: "#2e59d9",
         borderColor: "#2e59d9",

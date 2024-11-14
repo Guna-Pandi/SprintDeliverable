@@ -28,16 +28,26 @@ const DiagnosisStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }) =>
   };
 
   useEffect(() => {
-    // Parse selected age range
-    const [minAge, maxAge] = selectedAgeRange.split("-").map(Number);
+    // Handle 'all' age range case
+    const filterData = () => {
+      if (selectedAgeRange === "all") {
+        return data.filter(
+          (patient) => selectedDiagnosis === "all" || patient.diagnosis === selectedDiagnosis
+        );
+      } else {
+        // Parse selected age range
+        const [minAge, maxAge] = selectedAgeRange.split("-").map(Number);
+        return data.filter(
+          (patient) =>
+            patient.age >= minAge &&
+            patient.age <= maxAge &&
+            (selectedDiagnosis === "all" || patient.diagnosis === selectedDiagnosis)
+        );
+      }
+    };
 
     // Filter data based on selected age range and diagnosis
-    const filteredData = data.filter((patient) => {
-      const withinAgeRange = patient.age >= minAge && patient.age <= maxAge;
-      const matchesDiagnosis =
-        selectedDiagnosis === "all" || patient.diagnosis === selectedDiagnosis;
-      return withinAgeRange && matchesDiagnosis;
-    });
+    const filteredData = filterData();
 
     // Classify systolic BP and count diagnoses
     const diagnosisCounts = filteredData.reduce((acc, curr) => {

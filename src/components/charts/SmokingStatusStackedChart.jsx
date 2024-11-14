@@ -11,27 +11,46 @@ import {
   LinearScale,
 } from "chart.js";
 
-ChartJS.register(CategoryScale, BarElement, Title, Tooltip, Legend, LinearScale);
+ChartJS.register(
+  CategoryScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  LinearScale
+);
 
 const SmokingStatusStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
 
   useEffect(() => {
-    // Parse selected age range
-    const [minAge, maxAge] = selectedAgeRange.split("-").map(Number);
+    // Handle 'all' age range case
+    const filterData = () => {
+      if (selectedAgeRange === "all") {
+        return data.filter(
+          (patient) => selectedDiagnosis === "all" || patient.diagnosis === selectedDiagnosis
+        );
+      } else {
+        // Parse selected age range
+        const [minAge, maxAge] = selectedAgeRange.split("-").map(Number);
+        return data.filter(
+          (patient) =>
+            patient.age >= minAge &&
+            patient.age <= maxAge &&
+            (selectedDiagnosis === "all" || patient.diagnosis === selectedDiagnosis)
+        );
+      }
+    };
 
-    // Filter the data based on selected age range and diagnosis
-    const filteredData = data.filter((patient) => {
-      const withinAgeRange = patient.age >= minAge && patient.age <= maxAge;
-      const matchesDiagnosis =
-        selectedDiagnosis === "all" || patient.diagnosis === selectedDiagnosis;
-      return withinAgeRange && matchesDiagnosis;
-    });
+    // Filter data based on selected age range and diagnosis
+    const filteredData = filterData();
 
-    // Calculate diagnosis count by smoking status
+    // Count diagnoses by smoking status
     const smokingStatusCounts = filteredData.reduce((acc, patient) => {
       const { smoking_status: smokingStatus, diagnosis } = patient;
-      if (!acc[smokingStatus]) acc[smokingStatus] = {};
+      if (!acc[smokingStatus]) {
+        acc[smokingStatus] = {};
+      }
       acc[smokingStatus][diagnosis] = (acc[smokingStatus][diagnosis] || 0) + 1;
       return acc;
     }, {});
@@ -40,15 +59,7 @@ const SmokingStatusStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }
     const smokingStatuses = ["non-smoker", "occasional smoker", "regular smoker"];
     const diagnosisTypes = ["coronary artery disease", "hypertension", "stroke", "other"];
 
-    // Color configuration for each diagnosis type
-    const colors = {
-      "coronary artery disease": "#FF5733",
-      hypertension: "#33FF57",
-      stroke: "#FFC300",
-      other: "#3357FF",
-    };
-
-    // Prepare chart data with stacked bar configuration
+    // Prepare chart data with non-stacked bar configuration
     const newChartData = {
       labels: smokingStatuses,
       datasets: diagnosisTypes.map((diagnosis) => ({
@@ -56,7 +67,14 @@ const SmokingStatusStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }
         data: smokingStatuses.map(
           (status) => smokingStatusCounts[status]?.[diagnosis] || 0
         ),
-        backgroundColor: colors[diagnosis],
+        backgroundColor:
+          diagnosis === "coronary artery disease"
+            ? "#FF5733"
+            : diagnosis === "hypertension"
+            ? "#33FF57"
+            : diagnosis === "stroke"
+            ? "#3357FF"
+            : "#28A745",
       })),
     };
 
@@ -72,14 +90,14 @@ const SmokingStatusStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }
           display: true,
           text: "Smoking Status",
         },
-        stacked: true,
+        stacked: false, // Disable stacking on the x-axis
       },
       y: {
         title: {
           display: true,
           text: "Number of Patients",
         },
-        stacked: true,
+        stacked: false, // Disable stacking on the y-axis
         beginAtZero: true,
       },
     },
@@ -88,18 +106,13 @@ const SmokingStatusStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }
         position: "top",
       },
     },
+    indexAxis: "x", // Bar chart on the x-axis
   };
 
   return (
     <Card>
       <CardContent>
-        <Typography
-          variant="h6"
-          component="div"
-          gutterBottom
-          align="center"
-          color="textSecondary"
-        >
+        <Typography variant="h6" component="div" gutterBottom align="center" color="textSecondary">
           Diagnosis Count by Smoking Status
         </Typography>
         <div className="chartcard" style={{ height: 400 }}>

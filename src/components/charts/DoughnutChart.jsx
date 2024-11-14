@@ -9,16 +9,26 @@ const DoughnutChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
 
   useEffect(() => {
-    // Parse the selected age range
-    const [minAge, maxAge] = selectedAgeRange.split("-").map(Number);
+    // Handle the 'all' case for selectedAgeRange
+    const filterData = () => {
+      if (selectedAgeRange === "all") {
+        return data.filter(
+          (patient) => selectedDiagnosis === "all" || patient.diagnosis === selectedDiagnosis
+        );
+      } else {
+        // Parse selected age range
+        const [minAge, maxAge] = selectedAgeRange.split("-").map(Number);
+        return data.filter(
+          (patient) =>
+            patient.age >= minAge &&
+            patient.age <= maxAge &&
+            (selectedDiagnosis === "all" || patient.diagnosis === selectedDiagnosis)
+        );
+      }
+    };
 
-    // Filter the data based on the selected age range and diagnosis
-    const filteredData = data.filter((patient) => {
-      const withinAgeRange = patient.age >= minAge && patient.age <= maxAge;
-      const matchesDiagnosis =
-        selectedDiagnosis === "all" || patient.diagnosis === selectedDiagnosis;
-      return withinAgeRange && matchesDiagnosis;
-    });
+    // Filter the data based on selected age range and diagnosis
+    const filteredData = filterData();
 
     // Calculate the diagnosis counts in the filtered data
     const diagnosisCount = filteredData.reduce((acc, patient) => {
@@ -38,7 +48,7 @@ const DoughnutChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
         },
       ],
     });
-  }, [data, selectedAgeRange, selectedDiagnosis]); // Rerun the effect when `data`, `selectedAgeRange`, or `selectedDiagnosis` changes
+  }, [data, selectedAgeRange, selectedDiagnosis]); // Re-run the effect when filters or data change
 
   return (
     <Card>

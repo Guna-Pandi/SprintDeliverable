@@ -9,16 +9,26 @@ const GenderPieChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
 
   useEffect(() => {
-    // Parse selected age range
-    const [minAge, maxAge] = selectedAgeRange.split("-").map(Number);
+    // Handle the 'all' case for selectedAgeRange
+    const filterData = () => {
+      if (selectedAgeRange === "all") {
+        return data.filter(
+          (patient) => selectedDiagnosis === "all" || patient.diagnosis === selectedDiagnosis
+        );
+      } else {
+        // Parse selected age range
+        const [minAge, maxAge] = selectedAgeRange.split("-").map(Number);
+        return data.filter(
+          (patient) =>
+            patient.age >= minAge &&
+            patient.age <= maxAge &&
+            (selectedDiagnosis === "all" || patient.diagnosis === selectedDiagnosis)
+        );
+      }
+    };
 
-    // Filter data based on selected age range and diagnosis
-    const filteredData = data.filter((patient) => {
-      const withinAgeRange = patient.age >= minAge && patient.age <= maxAge;
-      const matchesDiagnosis =
-        selectedDiagnosis === "all" || patient.diagnosis === selectedDiagnosis;
-      return withinAgeRange && matchesDiagnosis;
-    });
+    // Filter the data based on selected age range and diagnosis
+    const filteredData = filterData();
 
     // Calculate gender counts for the filtered data
     const genderCounts = filteredData.reduce((acc, patient) => {
