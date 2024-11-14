@@ -11,17 +11,13 @@ import {
   LinearScale,
 } from "chart.js";
 
-ChartJS.register(
-  CategoryScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  LinearScale
-);
+ChartJS.register(CategoryScale, BarElement, Title, Tooltip, Legend, LinearScale);
 
-const AgeBarChart = ({ data }) => {
-  // Function to categorize ages into ranges
+const AgeBarChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
+  // Parse selectedAgeRange (e.g., "31-40") to get min and max age values
+  const [minAge, maxAge] = selectedAgeRange.split("-").map(Number);
+
+  // Function to categorize ages into predefined ranges
   const getAgeRange = (age) => {
     if (age >= 0 && age <= 30) return "0-30";
     if (age >= 31 && age <= 40) return "31-40";
@@ -33,8 +29,15 @@ const AgeBarChart = ({ data }) => {
     return "90+";
   };
 
-  // Count patients by age range
-  const ageCounts = data.reduce((acc, curr) => {
+  // Filter data based on selected age range and diagnosis
+  const filteredData = data.filter((patient) => {
+    const withinAgeRange = patient.age >= minAge && patient.age <= maxAge;
+    const matchesDiagnosis = selectedDiagnosis === "all" || patient.diagnosis === selectedDiagnosis;
+    return withinAgeRange && matchesDiagnosis;
+  });
+
+  // Count patients by age range within the filtered data
+  const ageCounts = filteredData.reduce((acc, curr) => {
     const ageRange = getAgeRange(curr.age);
     acc[ageRange] = (acc[ageRange] || 0) + 1;
     return acc;

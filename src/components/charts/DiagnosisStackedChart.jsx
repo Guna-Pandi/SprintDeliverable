@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import { Card, CardContent, Typography } from "@mui/material";
 import {
@@ -20,37 +20,59 @@ ChartJS.register(
   LinearScale
 );
 
-const DiagnosisStackedChart = ({ data }) => {
-  const chartRef = useRef(null);
+const DiagnosisStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
+  const [chartData, setChartData] = useState({ labels: [], datasets: [] });
 
   const classifySystolicBP = (systolic) => {
     return systolic >= 140 ? "High" : "Low";
   };
 
-  const diagnosisCounts = data.reduce((acc, curr) => {
-    const bpCategory = classifySystolicBP(curr.systolic_bp);
-    const diagnosis = curr.diagnosis;
+  useEffect(() => {
+    // Parse selected age range
+    const [minAge, maxAge] = selectedAgeRange.split("-").map(Number);
 
-    if (!acc[bpCategory]) {
-      acc[bpCategory] = {};
-    }
+    // Filter data based on selected age range and diagnosis
+    const filteredData = data.filter((patient) => {
+      const withinAgeRange = patient.age >= minAge && patient.age <= maxAge;
+      const matchesDiagnosis =
+        selectedDiagnosis === "all" || patient.diagnosis === selectedDiagnosis;
+      return withinAgeRange && matchesDiagnosis;
+    });
 
-    acc[bpCategory][diagnosis] = (acc[bpCategory][diagnosis] || 0) + 1;
+    // Classify systolic BP and count diagnoses
+    const diagnosisCounts = filteredData.reduce((acc, curr) => {
+      const bpCategory = classifySystolicBP(curr.systolic_bp);
+      const diagnosis = curr.diagnosis;
 
-    return acc;
-  }, {});
+      if (!acc[bpCategory]) {
+        acc[bpCategory] = {};
+      }
 
-  const labels = Object.keys(diagnosisCounts);
-  const diagnosisTypes = ["coronary artery disease", "hypertension","stroke", "other"]; 
-  
-  const chartData = {
-    labels: labels, 
-    datasets: diagnosisTypes.map((diagnosis) => ({
-      label: diagnosis,
-      data: labels.map((label) => diagnosisCounts[label]?.[diagnosis] || 0),
-      backgroundColor: diagnosis === "coronary artery disease" ? "#FF5733" :  diagnosis === "hypertension" ? "#33FF57" :diagnosis === "stroke" ? "#3357FF": "#28A745",
-    })),
-  };
+      acc[bpCategory][diagnosis] = (acc[bpCategory][diagnosis] || 0) + 1;
+
+      return acc;
+    }, {});
+
+    // Prepare chart data
+    const labels = Object.keys(diagnosisCounts);
+    const diagnosisTypes = ["coronary artery disease", "hypertension", "stroke", "other"];
+
+    setChartData({
+      labels: labels,
+      datasets: diagnosisTypes.map((diagnosis) => ({
+        label: diagnosis,
+        data: labels.map((label) => diagnosisCounts[label]?.[diagnosis] || 0),
+        backgroundColor:
+          diagnosis === "coronary artery disease"
+            ? "#FF5733"
+            : diagnosis === "hypertension"
+            ? "#33FF57"
+            : diagnosis === "stroke"
+            ? "#3357FF"
+            : "#28A745",
+      })),
+    });
+  }, [data, selectedAgeRange, selectedDiagnosis]); // Re-run the effect when filters or data change
 
   const chartOptions = {
     responsive: true,
@@ -79,29 +101,14 @@ const DiagnosisStackedChart = ({ data }) => {
     stacked: true, // Enables stacking
   };
 
-  useEffect(() => {
-    const chartInstance = chartRef.current;
-    return () => {
-      if (chartInstance) {
-        chartInstance.destroy();
-      }
-    };
-  }, []);
-
   return (
     <Card>
       <CardContent>
-        <Typography
-          variant="h6"
-          component="div"
-          gutterBottom
-          align="center"
-          color="textSecondary"
-        >
-          Diagnosis Count by Systolic BP 
+        <Typography variant="h6" component="div" gutterBottom align="center" color="textSecondary">
+          Diagnosis Count by Systolic BP
         </Typography>
         <div className="chartcard">
-          <Bar data={chartData} options={chartOptions} ref={chartRef} />
+          <Bar data={chartData} options={chartOptions} />
         </div>
       </CardContent>
     </Card>
