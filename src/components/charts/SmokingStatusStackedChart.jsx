@@ -10,6 +10,7 @@ import {
   Legend,
   LinearScale,
 } from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels"; // Import chartjs-plugin-datalabels
 
 ChartJS.register(
   CategoryScale,
@@ -17,7 +18,8 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  LinearScale
+  LinearScale,
+  ChartDataLabels // Register the datalabels plugin
 );
 
 const SmokingStatusStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
@@ -69,12 +71,12 @@ const SmokingStatusStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }
         ),
         backgroundColor:
           diagnosis === "coronary artery disease"
-            ? "#FF5733"
+            ? "#205260"
             : diagnosis === "hypertension"
-            ? "#33FF57"
+            ? "#fabf8d"
             : diagnosis === "stroke"
-            ? "#3357FF"
-            : "#28A745",
+            ? "#cc464c"
+            : "#e8993c",
       })),
     };
 
@@ -91,6 +93,9 @@ const SmokingStatusStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }
           text: "Smoking Status",
         },
         stacked: false, // Disable stacking on the x-axis
+        grid: {
+          display: false, // Disable gridlines on the x-axis
+        },
       },
       y: {
         title: {
@@ -99,11 +104,34 @@ const SmokingStatusStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }
         },
         stacked: false, // Disable stacking on the y-axis
         beginAtZero: true,
+        grid: {
+          display: false, // Disable gridlines on the y-axis
+        },
+        ticks: {
+          beginAtZero: true,
+          callback: function (value) {
+            if (value === 0) {
+              return ''; // Hide zero values on the y-axis
+            }
+            return value;
+          },
+        },
       },
     },
     plugins: {
       legend: {
         position: "top",
+      },
+      datalabels: {
+        display: (context) => context.dataset.data[context.dataIndex] !== 0, // Hide labels with zero values
+        color: 'gray', // Set label color to black
+        align: 'end', // Align labels to the top of the bars
+        anchor: 'end', // Anchor labels to the top of the bars
+        font: {
+          weight: 'bold',
+          size: 14, // Set the font size
+        },
+        formatter: (value) => value !== 0 ? value : '', // Display the count value, hide zero
       },
     },
     indexAxis: "x", // Bar chart on the x-axis

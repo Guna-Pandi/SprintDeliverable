@@ -74,12 +74,12 @@ const DiagnosisStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }) =>
         data: labels.map((label) => diagnosisCounts[label]?.[diagnosis] || 0),
         backgroundColor:
           diagnosis === "coronary artery disease"
-            ? "#FF5733"
+            ? "#205260"
             : diagnosis === "hypertension"
-            ? "#33FF57"
+            ? "#fabf8d"
             : diagnosis === "stroke"
-            ? "#3357FF"
-            : "#28A745",
+            ? "#cc464c"
+            : "#e8993c",
       })),
     });
   }, [data, selectedAgeRange, selectedDiagnosis]); // Re-run the effect when filters or data change
@@ -93,6 +93,9 @@ const DiagnosisStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }) =>
           display: true,
           text: "Systolic BP Category",
         },
+        grid: {
+          display: false, // Disable gridlines on x-axis
+        },
       },
       y: {
         title: {
@@ -100,11 +103,34 @@ const DiagnosisStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }) =>
           text: "Number of Patients",
         },
         beginAtZero: true,
+        grid: {
+          display: false, // Disable gridlines on y-axis
+        },
       },
     },
     plugins: {
       legend: {
         position: "top",
+      },
+      datalabels: {
+        display: (context) => context.dataset.data[context.dataIndex] !== 0, // Hide labels with zero values
+        color: 'gray', // Set label color to white
+        align: 'end', // Align data labels in the end of the doughnut slices
+        anchor: 'end', // Anchor labels to the top of the bars
+        font: {
+          weight: 'bold',
+          size: 14, // Set the font size
+        },
+        formatter: (value) => value !== 0 ? value : '', // Display the count value
+      },
+      tooltip: {
+        enabled: true, // Tooltip will display the value when hovering
+        callbacks: {
+          // Custom tooltip to show the value when hovering
+          label: function (tooltipItem) {
+            return tooltipItem.raw; // Show the raw value
+          },
+        },
       },
     },
     indexAxis: "x",
@@ -117,7 +143,7 @@ const DiagnosisStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }) =>
         <Typography variant="h6" component="div" gutterBottom align="center" color="textSecondary">
           Diagnosis Count by Systolic BP
         </Typography>
-        <div className="chartcard">
+        <div className="chartcard" style={{ height: 400 }}>
           <Bar data={chartData} options={chartOptions} />
         </div>
       </CardContent>
