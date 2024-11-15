@@ -17,6 +17,7 @@ const Predictor = () => {
     hdl: "",
     bmi: "",
     smoke: "",
+    heart_rate: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -30,6 +31,7 @@ const Predictor = () => {
     bs: [70, 200],
     hdl: [20, 100],
     bmi: [10, 60],
+    heart_rate: [40, 200],
   };
 
   const fieldLabels = {
@@ -42,6 +44,7 @@ const Predictor = () => {
     hdl: "HDL Cholesterol",
     bmi: "Body Mass Index",
     smoke: "Smoking Status",
+    heart_rate: "Heart Rate",
   };
 
   const handleChange = (e) => {
@@ -53,7 +56,6 @@ const Predictor = () => {
       [id]: value,
     }));
 
-    // Validate input on each change
     if (
       ranges[id] &&
       !isNaN(numericValue) &&
@@ -73,8 +75,8 @@ const Predictor = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setFormData(inputs);
-    navigate("/Home/Predictor/ResultPredict");
+    setFormData(inputs); // Store the input data in context
+    navigate("/Home/Predictor/ResultPredict"); // Navigate to the ResultPredict page
   };
 
   const isFormValid =
@@ -83,15 +85,13 @@ const Predictor = () => {
 
   return (
     <div className="mb-11 relative">
-      <h1 className="fixed top-0 left-0 right-0 h-[9vh] flex items-center justify-center md:justify-center font-extrabold text-white text-3xl opacity-100 z-[100] blur-effect-theme">
-        <div className="absolute top-1/2 transform -translate-y-1/2 left-5 md:hidden text-3xl cursor-pointer ">
+      <h1 className="fixed top-0 left-0 right-0 h-[9vh] flex items-center justify-center font-extrabold text-white text-3xl opacity-100 z-[100] blur-effect-theme">
+        <div className="absolute top-1/2 transform -translate-y-1/2 left-5 text-3xl cursor-pointer">
           <Link to="/">
             <HiHome className="hover:scale-90" />
           </Link>
         </div>
-        <span className="text-center">
-          Cardiovascular Disease Risk Predictor
-        </span>
+        <span className="text-center">Cardiovascular Disease Risk Predictor</span>
       </h1>
 
       <h1 className="flex justify-center items-center font-semibold text-2xl mt-24 mb-5 text-gray-900">
@@ -99,7 +99,7 @@ const Predictor = () => {
       </h1>
 
       <div className="flex justify-center items-center">
-        <div className="w-full max-w-2xl px-6 py-10 bg-white rounded-lg shadow-2xl ">
+        <div className="w-full max-w-2xl px-6 py-10 bg-white rounded-lg shadow-2xl">
           <form onSubmit={handleSubmit}>
             <div className="grid gap-6 mb-6 grid-cols-2">
               {Object.keys(inputs).map((field) => (

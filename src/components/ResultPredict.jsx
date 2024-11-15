@@ -1,91 +1,61 @@
-import React, { useContext, useState } from "react";
-import { FormContext } from "../FormContext";
-import { HiHome } from "react-icons/hi2";
-import { IoMdArrowRoundBack } from "react-icons/io";
-import { Link } from "react-router-dom";
-import axios from "axios";
+import React, { useContext, useState, useEffect } from 'react';
+import { FormContext } from "../FormContext"; // Assuming form data is stored here
+import axios from 'axios';
 
 const ResultPredict = () => {
-  const { formData } = useContext(FormContext);
-  const [prediction, setPrediction] = useState(null);
+  const { formData } = useContext(FormContext); // Get form data from context
+  const [prediction, setPrediction] = useState(null); // Store the prediction result
+  const [error, setError] = useState(null); // Store any error messages
 
-  // Map formData values to the input format required by the model
-  const inputData = [
-    formData.sbp,
-    formData.ldl,
-    formData.dbp,
-    formData.tgc,
-    formData.tc,
-    formData.bs,
-    formData.hdl,
-    formData.bmi,
-    formData.smoke
-  ];
-
-  const fieldLabels = {
-    sbp: "Systolic Blood Pressure",
-    ldl: "LDL Cholesterol",
-    dbp: "Diastolic Blood Pressure",
-    tgc: "Triglycerides",
-    tc: "Total Cholesterol",
-    bs: "Blood Sugar",
-    hdl: "HDL Cholesterol",
-    bmi: "Body Mass Index",
-    smoke: "Smoking Status",
-  };
-
-  const handlePredict = async () => {
-    try {
-      const response = await axios.post("http://127.0.0.1:5000/predict", {
-        input: inputData,
+  useEffect(() => {
+    const makePrediction = async () => {
+      // Convert formData values to the correct format
+      const inputValues = Object.values(formData).map(val => {
+        if (val === "Non-Smoker" || val === "Smoker") return val; // Handle categorical data
+        return isNaN(val) ? val : parseFloat(val); // Ensure numeric values are converted to floats
       });
-      setPrediction(response.data.prediction);
-    } catch (error) {
-      console.error("Error making prediction request:", error);
+
+      console.log("Input values to send:", inputValues); // Debugging log
+
+      try {
+        // Send a POST request to Flask API
+        const response = await axios.post('http://127.0.0.1:5000/predict', {
+          input: inputValues,
+        });
+
+        // Check the response for a prediction
+        if (response.data && response.data.prediction) {
+          setPrediction(response.data.prediction);
+        } else {
+          setPrediction('No prediction received.');
+        }
+      } catch (err) {
+        console.error("Error making prediction request:", err);
+        setError('Error occurred during prediction. Please try again.');
+      }
+    };
+
+    // Only send the request if formData has valid values
+    if (formData && Object.keys(formData).length > 0) {
+      makePrediction();
     }
-  };
+  }, [formData]); // Re-run when formData changes
 
   return (
-    <div className="mb-11 relative">
-      <h1 className="fixed top-0 left-0 right-0 h-[9vh] flex items-center justify-center md:justify-center font-extrabold text-white text-3xl opacity-100 z-[100] blur-effect-theme">
-        <div className="flex gap-4 absolute top-1/2 transform -translate-y-1/2 left-5 md:hidden text-3xl cursor-pointer ">
-          <Link to="/Home/Predictor">
-            <IoMdArrowRoundBack className="hover:scale-90" />
-          </Link>
-          <Link to="/">
-            <HiHome className="hover:scale-90" />
-          </Link>
+    <div>
+      <h2>Risk Prediction</h2>
+      {error && (
+        <div style={{ color: 'red' }}>
+          <p>Error: {error}</p>
         </div>
-        <span className="text-center">
-          Cardiovascular Disease Risk Predictor
-        </span>
-      </h1>
-      <div className="mt-28">
-        <div className="w-full max-w-sm bg-gray-200 rounded-lg shadow-2xl">
-          <div className="p-6">
-            <h1 className="text-2xl font-bold mb-4">Prediction Results</h1>
-            {Object.entries(formData).map(
-              ([key, value]) =>
-                fieldLabels[key] && (
-                  <p key={key} className="text-gray-800 mb-2">
-                    <strong>{fieldLabels[key]}:</strong> {value}
-                  </p>
-                )
-            )}
-            <button
-              onClick={handlePredict}
-              className="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-            >
-              Get Prediction
-            </button>
-            {prediction && (
-              <p className="mt-4 text-gray-800">
-                <strong>Prediction Result:</strong> {prediction}
-              </p>
-            )}
-          </div>
+      )}
+      {prediction ? (
+        <div>
+          <h3>Prediction: {prediction}</h3>
         </div>
-      </div>
+      ) : (
+        <p>Loading prediction...</p>
+      )}
     </div>
   );
 };
