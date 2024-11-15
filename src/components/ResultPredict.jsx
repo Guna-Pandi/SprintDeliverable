@@ -1,11 +1,26 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { FormContext } from "../FormContext";
 import { HiHome } from "react-icons/hi2";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const ResultPredict = () => {
   const { formData } = useContext(FormContext);
+  const [prediction, setPrediction] = useState(null);
+
+  // Map formData values to the input format required by the model
+  const inputData = [
+    formData.sbp,
+    formData.ldl,
+    formData.dbp,
+    formData.tgc,
+    formData.tc,
+    formData.bs,
+    formData.hdl,
+    formData.bmi,
+    formData.smoke
+  ];
 
   const fieldLabels = {
     sbp: "Systolic Blood Pressure",
@@ -17,6 +32,17 @@ const ResultPredict = () => {
     hdl: "HDL Cholesterol",
     bmi: "Body Mass Index",
     smoke: "Smoking Status",
+  };
+
+  const handlePredict = async () => {
+    try {
+      const response = await axios.post("http://127.0.0.1:5000/predict", {
+        input: inputData,
+      });
+      setPrediction(response.data.prediction);
+    } catch (error) {
+      console.error("Error making prediction request:", error);
+    }
   };
 
   return (
@@ -34,9 +60,9 @@ const ResultPredict = () => {
           Cardiovascular Disease Risk Predictor
         </span>
       </h1>
-      <div className=" mt-28 ">
-        <div className="w-full max-w-sm  bg-gray-200 rounded-lg shadow-2xl ">
-          <div className="p-6 ">
+      <div className="mt-28">
+        <div className="w-full max-w-sm bg-gray-200 rounded-lg shadow-2xl">
+          <div className="p-6">
             <h1 className="text-2xl font-bold mb-4">Prediction Results</h1>
             {Object.entries(formData).map(
               ([key, value]) =>
@@ -45,6 +71,17 @@ const ResultPredict = () => {
                     <strong>{fieldLabels[key]}:</strong> {value}
                   </p>
                 )
+            )}
+            <button
+              onClick={handlePredict}
+              className="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+            >
+              Get Prediction
+            </button>
+            {prediction && (
+              <p className="mt-4 text-gray-800">
+                <strong>Prediction Result:</strong> {prediction}
+              </p>
             )}
           </div>
         </div>
