@@ -1,28 +1,38 @@
 import React, { useEffect, useState } from "react";
-import { Pie } from "react-chartjs-2";
+import { Doughnut } from "react-chartjs-2";
 import { Card, CardContent, Typography } from "@mui/material";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels"; // Import chartjs-plugin-datalabels
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+// Register the necessary chart.js components and the datalabels plugin
+ChartJS.register(ArcElement, Tooltip, Legend, Title, ChartDataLabels);
 
-const PhysicalActivityPieChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
+const DoughnutChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
 
   useEffect(() => {
-    // Handle the 'all' case for selectedAgeRange
+    // Handle the 'all' case for selectedAgeRange and selectedDiagnosis
     const filterData = () => {
-      if (selectedAgeRange === "all") {
+      if (selectedAgeRange === "all" && selectedDiagnosis === "all") {
+        // If both are "all", return all data
+        return data;
+      } else if (selectedAgeRange === "all") {
+        // If only age range is "all", filter by diagnosis
+        return data.filter((patient) => patient.diagnosis === selectedDiagnosis);
+      } else if (selectedDiagnosis === "all") {
+        // If only diagnosis is "all", filter by age range
+        const [minAge, maxAge] = selectedAgeRange.split("-").map(Number);
         return data.filter(
-          (patient) => selectedDiagnosis === "all" || patient.diagnosis === selectedDiagnosis
+          (patient) => patient.age >= minAge && patient.age <= maxAge
         );
       } else {
-        // Parse selected age range
+        // If both filters are applied, filter by age range and diagnosis
         const [minAge, maxAge] = selectedAgeRange.split("-").map(Number);
         return data.filter(
           (patient) =>
             patient.age >= minAge &&
             patient.age <= maxAge &&
-            (selectedDiagnosis === "all" || patient.diagnosis === selectedDiagnosis)
+            patient.diagnosis === selectedDiagnosis
         );
       }
     };
@@ -32,31 +42,59 @@ const PhysicalActivityPieChart = ({ data, selectedAgeRange, selectedDiagnosis })
 
     // Calculate diagnosis count by physical activity
     const physicalActivityCounts = filteredData.reduce((acc, patient) => {
-      const { physical_activity: physicalActivity, diagnosis } = patient;
-      if (!acc[physicalActivity]) acc[physicalActivity] = {};
-      acc[physicalActivity][diagnosis] = (acc[physicalActivity][diagnosis] || 0) + 1;
+      const { physical_activity: physicalActivity } = patient;
+      if (!acc[physicalActivity]) acc[physicalActivity] = 0;
+      acc[physicalActivity] += 1;
       return acc;
     }, {});
 
     // Define physical activity types
     const physicalActivities = Object.keys(physicalActivityCounts);
-    const diagnoses = ["coronary artery disease", "hypertension", "stroke", "other"];
 
     // Prepare chart data
     const newChartData = {
       labels: physicalActivities,
-      datasets: diagnoses.map((diagnosis) => ({
-        label: diagnosis,
-        data: physicalActivities.map(
-          (activity) => physicalActivityCounts[activity]?.[diagnosis] || 0
-        ),
-        backgroundColor: ["#FF5733", "#33FF57", "#FFC300", "#3357FF"],
-        hoverBackgroundColor: ["#C70039", "#28A745", "#FF8C00", "#0056B3"],
-      })),
+      datasets: [
+        {
+          label: "Physical Activity",
+          data: physicalActivities.map(
+            (activity) => physicalActivityCounts[activity] || 0
+          ),
+          backgroundColor: ["#205260", "#fabf8d", "#cc464c", "#e8993c"],
+          hoverBackgroundColor: ["#205260", "#fabf8d", "#cc464c", "#e8993c"],
+        },
+      ],
     };
 
     setChartData(newChartData);
   }, [data, selectedAgeRange, selectedDiagnosis]); // Re-run effect when filters or data change
+
+  const options = {
+    maintainAspectRatio: false,
+    plugins: {
+      tooltip: {
+        enabled: false, // Disable tooltips
+      },
+      datalabels: {
+        display: (context) => context.dataset.data[context.dataIndex] !== 0, // Hide labels with zero values
+        color: 'gray', // Set label color to white
+        align: 'start', // Align data labels in the center of the doughnut slices
+        anchor: 'start', // Position labels outside of the doughnut
+        font: {
+          weight: 'bold',
+          size: 14, // Set the font size
+        },
+        formatter: (value) => value !== 0 ? value : '', // Display the count value
+      },
+    },
+    responsive: true,
+    cutout: '70%', // Defines the thickness of the doughnut chart (inner radius)
+    elements: {
+      arc: {
+        borderWidth: 4, // Border width around doughnut slices
+      },
+    },
+  };
 
   return (
     <Card>
@@ -71,11 +109,11 @@ const PhysicalActivityPieChart = ({ data, selectedAgeRange, selectedDiagnosis })
           Diagnosis Count by Physical Activity
         </Typography>
         <div className="chartcard" style={{ height: 400 }}>
-          <Pie data={chartData} options={{ maintainAspectRatio: false }} />
+          <Doughnut data={chartData} options={options} />
         </div>
       </CardContent>
     </Card>
   );
 };
 
-export default PhysicalActivityPieChart;
+export default DoughnutChart;

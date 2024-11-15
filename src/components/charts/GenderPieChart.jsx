@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Pie } from "react-chartjs-2";
 import { Card, CardContent, Typography } from "@mui/material";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels"; // Import chartjs-plugin-datalabels
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+// Register the necessary chart.js components and the datalabels plugin
+ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
 const GenderPieChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
@@ -42,12 +44,32 @@ const GenderPieChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
       datasets: [
         {
           data: Object.values(genderCounts),
-          backgroundColor: ["#4e73df", "#1cc88a", "#36b9cc"], // Adjust colors as needed
-          hoverBackgroundColor: ["#2e59d9", "#17a673", "#2c9faf"], // Adjust hover colors
+          backgroundColor: ["#205260", "#fabf8d", "#cc464c"], // Adjust colors as needed
+          hoverBackgroundColor: ["#205260", "#fabf8d", "#cc464c"], // Adjust hover colors
         },
       ],
     });
   }, [data, selectedAgeRange, selectedDiagnosis]); // Re-run the effect when filters or data change
+
+  const options = {
+    maintainAspectRatio: false,
+    plugins: {
+      tooltip: {
+        enabled: false, // Disable tooltips
+      },
+      datalabels: {
+        display: (context) => context.dataset.data[context.dataIndex] !== 0, // Hide labels with zero values
+        color: 'white', // Set label color to white
+        align: 'center', // Align data labels in the center of the pie slices
+        font: {
+          weight: 'bold',
+          size: 14, // Set the font size
+        },
+        formatter: (value) => value !== 0 ? value : '', // Display the count value, hide zero
+      },
+    },
+    responsive: true,
+  };
 
   return (
     <Card>
@@ -56,7 +78,7 @@ const GenderPieChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
           Gender Distribution
         </Typography>
         <div className="chartcard" style={{ height: 400 }}>
-          <Pie data={chartData} options={{ maintainAspectRatio: false }} />
+          <Pie data={chartData} options={options} />
         </div>
       </CardContent>
     </Card>

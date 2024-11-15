@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { Card, CardContent, Typography } from "@mui/material";
 import { Chart as ChartJS, Title, ArcElement, Tooltip, Legend } from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels"; // Import chartjs-plugin-datalabels
 
-ChartJS.register(Title, ArcElement, Tooltip, Legend);
+// Register the necessary chart.js components and the datalabels plugin
+ChartJS.register(Title, ArcElement, Tooltip, Legend, ChartDataLabels);
 
 const DoughnutChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
@@ -43,12 +45,40 @@ const DoughnutChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
       datasets: [
         {
           data: Object.values(diagnosisCount),
-          backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#28A745"],
-          hoverBackgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#28A745"],
+          backgroundColor: ["#205260", "#fabf8d", "#cc464c", "#e8993c"],
+          hoverBackgroundColor: ["#205260", "#fabf8d", "#cc464c", "#e8993c"],
         },
       ],
     });
   }, [data, selectedAgeRange, selectedDiagnosis]); // Re-run the effect when filters or data change
+
+  const options = {
+    maintainAspectRatio: false,
+    plugins: {
+      tooltip: {
+        enabled: false, // Disable tooltips
+      },
+      datalabels: {
+        display: (context) => context.dataset.data[context.dataIndex] !== 0, // Hide labels with zero values
+        color: 'gray', // Set label color to black
+        align: 'start', // Align data labels outside the doughnut
+        anchor: 'start', // Position labels outside of the doughnut
+        font: {
+          weight: 'bold',
+          size: 14, // Set the font size
+        },
+        formatter: (value) => value !== 0 ? value : '', // Display the count value, hide zero
+        offset: 15, // Move the labels slightly outside the doughnut
+      },
+    },
+    responsive: true,
+    cutout: '70%', // Defines the thickness of the doughnut chart (inner radius)
+    elements: {
+      arc: {
+        borderWidth: 4, // Border width around doughnut slices
+      },
+    },
+  };
 
   return (
     <Card>
@@ -63,7 +93,7 @@ const DoughnutChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
           Patient Count by Diagnosis
         </Typography>
         <div className="chartcard" style={{ height: 400 }}>
-          <Doughnut data={chartData} options={{ maintainAspectRatio: false }} />
+          <Doughnut data={chartData} options={options} />
         </div>
       </CardContent>
     </Card>

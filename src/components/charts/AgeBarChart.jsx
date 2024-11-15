@@ -76,9 +76,9 @@ const AgeBarChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
       {
         label: "Number of Patients",
         data: ageRanges.map((range) => ageCounts[range] || 0), // Handle missing age range counts
-        backgroundColor: "#4e73df",
-        hoverBackgroundColor: "#2e59d9",
-        borderColor: "#2e59d9",
+        backgroundColor: "#205260",
+        hoverBackgroundColor: "#205260",
+        borderColor: "#205260",
         borderWidth: 1,
       },
     ],
@@ -93,6 +93,9 @@ const AgeBarChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
           display: true,
           text: "Age Range",
         },
+        grid: {
+          display: false, // Disable gridlines on x-axis
+        },
       },
       y: {
         title: {
@@ -100,8 +103,39 @@ const AgeBarChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
           text: "Number of Patients",
         },
         beginAtZero: true,
+        grid: {
+          display: false, // Disable gridlines on y-axis
+        },
+      },
+      
+    },
+    plugins: {
+      legend: {
+        position: "top",
+      },
+      datalabels: {
+        display: (context) => context.dataset.data[context.dataIndex] !== 0, // Hide labels with zero values
+        color: 'gray', // Set label color to white
+        align: 'end', // Align data labels in the end of the doughnut slices
+        anchor: 'end', // Anchor labels to the top of the bars
+        font: {
+          weight: 'bold',
+          size: 14, // Set the font size
+        },
+        formatter: (value) => value !== 0 ? value : '', // Display the count value
+      },
+      tooltip: {
+        enabled: true, // Tooltip will display the value when hovering
+        callbacks: {
+          // Custom tooltip to show the value when hovering
+          label: function (tooltipItem) {
+            return tooltipItem.raw; // Show the raw value
+          },
+        },
       },
     },
+    indexAxis: "x",
+    stacked: true, // Enables stacking
   };
 
   return (

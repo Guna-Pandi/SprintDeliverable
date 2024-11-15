@@ -8,7 +8,7 @@ import SmokingStatusStackedChart from "./charts/SmokingStatusStackedChart";
 import PhysicalActivityPieChart from "./charts/PhysicalActivityPieChart";
 import { HiHome } from "react-icons/hi2";
 import { Link } from "react-router-dom";
-import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { FormControl, InputLabel, Select, MenuItem, Card, CardContent, Typography } from "@mui/material";
 
 const Dashboard = () => {
   // State for filters
@@ -118,26 +118,87 @@ const Dashboard = () => {
         </FormControl>
       </div>
 
-      {/* Display Dynamic Metrics */}
-      <div className="p-5">
-        <p>Number of Patients: {patientCount}</p>
-        <p>Average Cholesterol: {avgCholesterol.toFixed(2)}</p>
-        <p>Average Blood Sugar: {avgBloodSugar.toFixed(2)}</p>
-        <p>Average Triglycerides: {avgTriglyceride.toFixed(2)}</p>
-        <p>Average Heart Rate: {avgHeartRate.toFixed(2)}</p>
+      {/* Display Dynamic Metrics in a Single Row with Increased Space */}
+      <div className="p-5 mt-8 flex gap-8 justify-between">
+        <Card sx={{ minWidth: 220, backgroundColor: "#f5f5f5", boxShadow: 3, borderRadius: 4 }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom style={{ color: "black" }}>
+              Number of Patients
+            </Typography>
+            <Typography variant="h5" color="textSecondary" align="center">
+              {patientCount}
+            </Typography>
+          </CardContent>
+        </Card>
+
+        <Card sx={{ minWidth: 220, backgroundColor: "#f5f5f5", boxShadow: 3, borderRadius: 4 }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom style={{ color: "black" }}>
+              Average Cholesterol
+            </Typography>
+            <Typography variant="h5" color="textSecondary" align="center">
+              {avgCholesterol.toFixed(2)}
+            </Typography>
+          </CardContent>
+        </Card>
+
+        <Card sx={{ minWidth: 220, backgroundColor: "#f5f5f5", boxShadow: 3, borderRadius: 4 }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom style={{ color: "black" }}>
+              Average Blood Sugar
+            </Typography>
+            <Typography variant="h5" color="textSecondary" align="center">
+              {avgBloodSugar.toFixed(2)}
+            </Typography>
+          </CardContent>
+        </Card>
+
+        <Card sx={{ minWidth: 220, backgroundColor: "#f5f5f5", boxShadow: 3, borderRadius: 4 }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom style={{ color: "black" }}>
+              Average Triglycerides
+            </Typography>
+            <Typography variant="h5" color="textSecondary" align="center">
+              {avgTriglyceride.toFixed(2)}
+            </Typography>
+          </CardContent>
+        </Card>
+
+        <Card sx={{ minWidth: 220, backgroundColor: "#f5f5f5", boxShadow: 3, borderRadius: 4 }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom style={{ color: "black" }}>
+              Average Heart Rate
+            </Typography>
+            <Typography variant="h5" color="textSecondary" align="center">
+              {avgHeartRate.toFixed(2)}
+            </Typography>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Chart Section */}
-      <div className="p-5 grid gap-8 mt-5 sm:grid-cols-1 md:grid-cols-2">
-        <div className="flex flex-row md:flex-col sm:flex-col items-center gap-7 overflow-hidden">
-          <GenderPieChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
-          <DiagnosisStackedChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
-          <PhysicalActivityPieChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
+      {/* Chart Section with Increased Gap Between Cards */}
+      <div className="p-5 grid gap-10 mt-5 sm:grid-cols-5 md:grid-cols-3">
+        <div className="flex flex-row md:flex-col sm:flex-col items-center gap-16 overflow-hidden">
+          <Card sx={{ boxShadow: 5, borderRadius: 3 }}>
+            <GenderPieChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
+          </Card>
+          <Card sx={{ boxShadow: 5, borderRadius: 3 }}>
+            <DiagnosisStackedChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
+          </Card>
+          <Card sx={{ boxShadow: 5, borderRadius: 3}}>
+            <PhysicalActivityPieChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
+          </Card>
         </div>
-        <div className="flex flex-row md:flex-col sm:flex-col items-center gap-7 overflow-hidden">
-          <AgeBarChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
-          <SmokingStatusStackedChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
-          <DoughnutChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
+        <div className="flex flex-row md:flex-col sm:flex-col items-center gap-16 overflow-hidden">
+          <Card sx={{ boxShadow: 5, borderRadius: 3}}>
+            <AgeBarChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
+          </Card>
+          <Card sx={{ boxShadow: 5, borderRadius: 3}}>
+            <SmokingStatusStackedChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
+          </Card>
+          <Card sx={{ boxShadow: 5, borderRadius: 3 }}>
+            <DoughnutChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
+          </Card>
         </div>
       </div>
     </div>
