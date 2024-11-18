@@ -1,11 +1,11 @@
 import React, { useState, useContext } from "react";
+import axios from "axios";
 import { FormContext } from "../FormContext";
 import { HiHome } from "react-icons/hi2";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Predictor = () => {
   const { setFormData } = useContext(FormContext);
-  const navigate = useNavigate();
 
   const [inputs, setInputs] = useState({
     sbp: "",
@@ -20,7 +20,9 @@ const Predictor = () => {
     heart_rate: "",
   });
 
-  const [errors, setErrors] = useState({});
+  const [result, setResult] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   const ranges = {
     sbp: [90, 180],
@@ -49,49 +51,78 @@ const Predictor = () => {
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    const numericValue = parseInt(value, 10);
 
     setInputs((prevInputs) => ({
       ...prevInputs,
       [id]: value,
     }));
-
-    if (
-      ranges[id] &&
-      !isNaN(numericValue) &&
-      (numericValue < ranges[id][0] || numericValue > ranges[id][1])
-    ) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        [id]: `Please enter a value between ${ranges[id][0]} and ${ranges[id][1]}.`,
-      }));
-    } else {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        [id]: "",
-      }));
-    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setFormData(inputs); // Store the input data in context
-    navigate("/Home/Predictor/ResultPredict"); // Navigate to the ResultPredict page
+    setErrorMessage("");
+    setResult("");
+
+    let smokeNumeric = 0;
+    if (inputs.smoke === "Occasional") smokeNumeric = 1;
+    if (inputs.smoke === "Regular") smokeNumeric = 2;
+
+    const inputArray = [
+      parseFloat(inputs.sbp),
+      parseFloat(inputs.ldl),
+      parseFloat(inputs.dbp),
+      parseFloat(inputs.tgc),
+      parseFloat(inputs.tc),
+      parseFloat(inputs.bs),
+      parseFloat(inputs.hdl),
+      parseFloat(inputs.bmi),
+      smokeNumeric,
+      parseFloat(inputs.heart_rate),
+    ];
+
+    try {
+      const response = await axios.post("http://127.0.0.1:5000/predict", {
+        input: inputArray,
+      });
+
+      if (response.data.prediction) {
+        setResult(`Risk Category: ${response.data.prediction}`);
+        setFormData(inputs);
+      } else {
+        setErrorMessage("Error: Could not get a prediction from the server.");
+      }
+    } catch (err) {
+      setErrorMessage(
+        err.response?.data?.error || "Error occurred during the request."
+      );
+    }
+    setShowModal(true);
   };
 
-  const isFormValid =
-    Object.values(errors).every((error) => error === "") &&
-    Object.values(inputs).every((input) => input !== "");
+  const isFormValid = Object.keys(inputs).every((field) => {
+    if (field === "smoke") {
+      return inputs[field] !== "";
+    }
+    return inputs[field] !== "" && !isNaN(parseFloat(inputs[field]));
+  });
+
+  const closeModal = () => {
+    setShowModal(false);
+    setResult("");
+    setErrorMessage("");
+  };
 
   return (
     <div className="mb-11 relative">
       <h1 className="fixed top-0 left-0 right-0 h-[9vh] flex items-center justify-center font-extrabold text-white text-3xl opacity-100 z-[100] blur-effect-theme">
-        <div className="absolute top-1/2 transform -translate-y-1/2 left-5 text-3xl cursor-pointer">
+      <div className="absolute top-1/2 transform -translate-y-1/2 left-5 md:hidden text-3xl cursor-pointer ">
           <Link to="/">
             <HiHome className="hover:scale-90" />
           </Link>
         </div>
-        <span className="text-center">Cardiovascular Disease Risk Predictor</span>
+        <span className="text-center">
+          Cardiovascular Disease Risk Predictor
+        </span>
       </h1>
 
       <h1 className="flex justify-center items-center font-semibold text-2xl mt-24 mb-5 text-gray-900">
@@ -131,12 +162,13 @@ const Predictor = () => {
                       value={inputs[field]}
                       onChange={handleChange}
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                      placeholder={`${ranges[field][0]}-${ranges[field][1]}`}
+                      placeholder={
+                        ranges[field]
+                          ? `${ranges[field][0]}-${ranges[field][1]}`
+                          : "Enter value"
+                      }
                       required
                     />
-                  )}
-                  {errors[field] && (
-                    <p className="text-red-500 text-sm">{errors[field]}</p>
                   )}
                 </div>
               ))}
@@ -155,6 +187,22 @@ const Predictor = () => {
           </form>
         </div>
       </div>
+
+      {showModal && (
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Result</h2>
+            {result && <p className="text-green-600">{result}</p>}
+            {errorMessage && <p className="text-red-600">{errorMessage}</p>}
+            <button
+              onClick={closeModal}
+              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

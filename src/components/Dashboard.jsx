@@ -59,7 +59,7 @@ const Dashboard = () => {
   return (
     <div className="mb-11 relative">
       <h1 className="fixed top-0 left-0 right-0 h-[9vh] flex items-center justify-center md:justify-center font-extrabold text-white text-3xl opacity-100 z-[100] blur-effect-theme">
-        <div className="absolute top-1/2 transform -translate-y-1/2 left-5 md:hidden text-3xl cursor-pointer">
+      <div className="absolute top-1/2 transform -translate-y-1/2 left-5 md:hidden text-3xl cursor-pointer ">
           <Link to="/">
             <HiHome className="hover:scale-90" />
           </Link>
