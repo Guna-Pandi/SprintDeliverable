@@ -129,7 +129,7 @@ const SmokingStatusStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }
         anchor: 'end', // Anchor labels to the top of the bars
         font: {
           weight: 'bold',
-          size: 14, // Set the font size
+          size: 11.5, // Set the font size
         },
         formatter: (value) => value !== 0 ? value : '', // Display the count value, hide zero
       },

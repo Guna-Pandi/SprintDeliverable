@@ -24,6 +24,8 @@ const Predictor = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showModal, setShowModal] = useState(false);
 
+  const [validationErrors, setValidationErrors] = useState({});
+
   const ranges = {
     sbp: [90, 180],
     ldl: [50, 190],
@@ -56,6 +58,22 @@ const Predictor = () => {
       ...prevInputs,
       [id]: value,
     }));
+
+    // Validate input value on change
+    if (id !== "smoke") {
+      const [min, max] = ranges[id];
+      if (value !== "" && (parseFloat(value) < min || parseFloat(value) > max)) {
+        setValidationErrors((prevErrors) => ({
+          ...prevErrors,
+          [id]: `Value should be between ${min} and ${max}`,
+        }));
+      } else {
+        setValidationErrors((prevErrors) => {
+          const { [id]: removedError, ...rest } = prevErrors;
+          return rest;
+        });
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -103,7 +121,11 @@ const Predictor = () => {
     if (field === "smoke") {
       return inputs[field] !== "";
     }
-    return inputs[field] !== "" && !isNaN(parseFloat(inputs[field]));
+    return (
+      inputs[field] !== "" &&
+      !isNaN(parseFloat(inputs[field])) &&
+      !validationErrors[field]
+    );
   });
 
   const closeModal = () => {
@@ -115,14 +137,12 @@ const Predictor = () => {
   return (
     <div className="mb-11 relative">
       <h1 className="fixed top-0 left-0 right-0 h-[9vh] flex items-center justify-center font-extrabold text-white text-3xl opacity-100 z-[100] blur-effect-theme">
-      <div className="absolute top-1/2 transform -translate-y-1/2 left-5 md:hidden text-3xl cursor-pointer ">
+        <div className="absolute top-1/2 transform -translate-y-1/2 left-5 md:hidden text-3xl cursor-pointer ">
           <Link to="/">
             <HiHome className="hover:scale-90" />
           </Link>
         </div>
-        <span className="text-center">
-          Cardiovascular Disease Risk Predictor
-        </span>
+        <span className="text-center">Cardiovascular Disease Risk Predictor</span>
       </h1>
 
       <h1 className="flex justify-center items-center font-semibold text-2xl mt-24 mb-5 text-gray-900">
@@ -161,7 +181,9 @@ const Predictor = () => {
                       id={field}
                       value={inputs[field]}
                       onChange={handleChange}
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                      className={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ${
+                        validationErrors[field] ? "border-red-500" : "border-gray-300"
+                      }`}
                       placeholder={
                         ranges[field]
                           ? `${ranges[field][0]}-${ranges[field][1]}`
@@ -169,6 +191,9 @@ const Predictor = () => {
                       }
                       required
                     />
+                  )}
+                  {validationErrors[field] && (
+                    <p className="text-red-500 text-xs mt-1">{validationErrors[field]}</p>
                   )}
                 </div>
               ))}

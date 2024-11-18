@@ -141,7 +141,7 @@ const Dashboard = () => {
       </div>
 
       {/* Chart Section with Increased Gap Between Cards */}
-      <div className="p-5 grid gap-4 grid-cols-3 md:grid-cols-1 ">
+      <div className="p-5 grid gap-4 grid-cols-2 md:grid-cols-1 ">
         <Card sx={{ boxShadow: 5, borderRadius: 3 }}>
           <GenderPieChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
         </Card>
