@@ -62,7 +62,10 @@ const Predictor = () => {
     // Validate input value on change
     if (id !== "smoke") {
       const [min, max] = ranges[id];
-      if (value !== "" && (parseFloat(value) < min || parseFloat(value) > max)) {
+      if (
+        value !== "" &&
+        (parseFloat(value) < min || parseFloat(value) > max)
+      ) {
         setValidationErrors((prevErrors) => ({
           ...prevErrors,
           [id]: `Value should be between ${min} and ${max}`,
@@ -142,7 +145,9 @@ const Predictor = () => {
             <HiHome className="hover:scale-90" />
           </Link>
         </div>
-        <span className="text-center">Cardiovascular Disease Risk Predictor</span>
+        <span className="text-center">
+          Cardiovascular Disease Risk Predictor
+        </span>
       </h1>
 
       <h1 className="flex justify-center items-center font-semibold text-2xl mt-24 mb-5 text-gray-900">
@@ -182,7 +187,9 @@ const Predictor = () => {
                       value={inputs[field]}
                       onChange={handleChange}
                       className={`bg-gray-50 border text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 ${
-                        validationErrors[field] ? "border-red-500" : "border-gray-300"
+                        validationErrors[field]
+                          ? "border-red-500"
+                          : "border-gray-300"
                       }`}
                       placeholder={
                         ranges[field]
@@ -193,7 +200,9 @@ const Predictor = () => {
                     />
                   )}
                   {validationErrors[field] && (
-                    <p className="text-red-500 text-xs mt-1">{validationErrors[field]}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {validationErrors[field]}
+                    </p>
                   )}
                 </div>
               ))}
@@ -217,7 +226,21 @@ const Predictor = () => {
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Result</h2>
-            {result && <p className="text-green-600">{result}</p>}
+            {result && (
+              <p>
+                <span className="font-bold text-gray-700">Risk Category:</span>{" "}
+                <span
+                  className={
+                    result.includes("High Risk")
+                      ? "text-red-600"
+                      : "text-green-600"
+                  }
+                >
+                  {result.replace("Risk Category:", "").trim()}
+                </span>
+              </p>
+            )}
+
             {errorMessage && <p className="text-red-600">{errorMessage}</p>}
             <button
               onClick={closeModal}
