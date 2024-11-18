@@ -59,7 +59,7 @@ const Dashboard = () => {
   return (
     <div className="mb-11 relative">
       <h1 className="fixed top-0 left-0 right-0 h-[9vh] flex items-center justify-center md:justify-center font-extrabold text-white text-3xl opacity-100 z-[100] blur-effect-theme">
-      <div className="absolute top-1/2 transform -translate-y-1/2 left-5 md:hidden text-3xl cursor-pointer ">
+        <div className="absolute top-1/2 transform -translate-y-1/2 left-5 md:hidden text-3xl cursor-pointer ">
           <Link to="/">
             <HiHome className="hover:scale-90" />
           </Link>
@@ -68,7 +68,7 @@ const Dashboard = () => {
       </h1>
 
       {/* Filter Section */}
-      <div className="p-5 mt-20 grid grid-cols-2 gap-4">
+      <div className="p-5 mt-20  flex gap-10 justify-center items-center md:flex-col">
         {/* Age Range Filter */}
         <FormControl fullWidth variant="outlined">
           <InputLabel style={{ color: "black" }}>Age Range</InputLabel>
@@ -119,87 +119,47 @@ const Dashboard = () => {
       </div>
 
       {/* Display Dynamic Metrics in a Single Row with Increased Space */}
-      <div className="p-5 mt-8 flex gap-8 justify-between">
-        <Card sx={{ minWidth: 220, backgroundColor: "#f5f5f5", boxShadow: 3, borderRadius: 4 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom style={{ color: "black" }}>
-              Number of Patients
-            </Typography>
-            <Typography variant="h5" color="textSecondary" align="center">
-              {patientCount}
-            </Typography>
-          </CardContent>
-        </Card>
-
-        <Card sx={{ minWidth: 220, backgroundColor: "#f5f5f5", boxShadow: 3, borderRadius: 4 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom style={{ color: "black" }}>
-              Average Cholesterol
-            </Typography>
-            <Typography variant="h5" color="textSecondary" align="center">
-              {avgCholesterol.toFixed(2)}
-            </Typography>
-          </CardContent>
-        </Card>
-
-        <Card sx={{ minWidth: 220, backgroundColor: "#f5f5f5", boxShadow: 3, borderRadius: 4 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom style={{ color: "black" }}>
-              Average Blood Sugar
-            </Typography>
-            <Typography variant="h5" color="textSecondary" align="center">
-              {avgBloodSugar.toFixed(2)}
-            </Typography>
-          </CardContent>
-        </Card>
-
-        <Card sx={{ minWidth: 220, backgroundColor: "#f5f5f5", boxShadow: 3, borderRadius: 4 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom style={{ color: "black" }}>
-              Average Triglycerides
-            </Typography>
-            <Typography variant="h5" color="textSecondary" align="center">
-              {avgTriglyceride.toFixed(2)}
-            </Typography>
-          </CardContent>
-        </Card>
-
-        <Card sx={{ minWidth: 220, backgroundColor: "#f5f5f5", boxShadow: 3, borderRadius: 4 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom style={{ color: "black" }}>
-              Average Heart Rate
-            </Typography>
-            <Typography variant="h5" color="textSecondary" align="center">
-              {avgHeartRate.toFixed(2)}
-            </Typography>
-          </CardContent>
-        </Card>
+      <div className="p-5 mt-8 grid gap-4 grid-cols-5 md:grid-cols-2 ">
+        {[
+          { label: "Number of Patients", value: patientCount },
+          { label: "Average Cholesterol", value: avgCholesterol.toFixed(2) },
+          { label: "Average Blood Sugar", value: avgBloodSugar.toFixed(2) },
+          { label: "Average Triglycerides", value: avgTriglyceride.toFixed(2) },
+          { label: "Average Heart Rate", value: avgHeartRate.toFixed(2) },
+        ].map((metric, index) => (
+          <Card key={index} sx={{ minWidth: 100, backgroundColor: "#f5f5f5", boxShadow: 3, borderRadius: 4 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom style={{ color: "black" }}>
+                {metric.label}
+              </Typography>
+              <Typography variant="h5" color="textSecondary" align="center">
+                {metric.value}
+              </Typography>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Chart Section with Increased Gap Between Cards */}
-      <div className="p-5 grid gap-10 mt-5 sm:grid-cols-5 md:grid-cols-3">
-        <div className="flex flex-row md:flex-col sm:flex-col items-center gap-16 overflow-hidden">
-          <Card sx={{ boxShadow: 5, borderRadius: 3 }}>
-            <GenderPieChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
-          </Card>
-          <Card sx={{ boxShadow: 5, borderRadius: 3 }}>
-            <DiagnosisStackedChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
-          </Card>
-          <Card sx={{ boxShadow: 5, borderRadius: 3}}>
-            <PhysicalActivityPieChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
-          </Card>
-        </div>
-        <div className="flex flex-row md:flex-col sm:flex-col items-center gap-16 overflow-hidden">
-          <Card sx={{ boxShadow: 5, borderRadius: 3}}>
-            <AgeBarChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
-          </Card>
-          <Card sx={{ boxShadow: 5, borderRadius: 3}}>
-            <SmokingStatusStackedChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
-          </Card>
-          <Card sx={{ boxShadow: 5, borderRadius: 3 }}>
-            <DoughnutChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
-          </Card>
-        </div>
+      <div className="p-5 grid gap-4 grid-cols-3 md:grid-cols-1 ">
+        <Card sx={{ boxShadow: 5, borderRadius: 3 }}>
+          <GenderPieChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
+        </Card>
+        <Card sx={{ boxShadow: 5, borderRadius: 3 }}>
+          <DiagnosisStackedChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
+        </Card>
+        <Card sx={{ boxShadow: 5, borderRadius: 3 }}>
+          <PhysicalActivityPieChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
+        </Card>
+        <Card sx={{ boxShadow: 5, borderRadius: 3 }}>
+          <AgeBarChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
+        </Card>
+        <Card sx={{ boxShadow: 5, borderRadius: 3 }}>
+          <SmokingStatusStackedChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
+        </Card>
+        <Card sx={{ boxShadow: 5, borderRadius: 3 }}>
+          <DoughnutChart data={patientData} selectedAgeRange={selectedAgeRange} selectedDiagnosis={selectedDiagnosis} />
+        </Card>
       </div>
     </div>
   );
