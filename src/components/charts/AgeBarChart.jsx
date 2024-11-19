@@ -22,8 +22,6 @@ const AgeBarChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
     "51-60",
     "61-70",
     "71-80",
-    "81-90",
-    "90+",
   ];
 
   // Function to categorize ages into predefined ranges
@@ -34,8 +32,6 @@ const AgeBarChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
     if (age >= 51 && age <= 60) return "51-60";
     if (age >= 61 && age <= 70) return "61-70";
     if (age >= 71 && age <= 80) return "71-80";
-    if (age >= 81 && age <= 90) return "81-90";
-    return "90+";
   };
 
   // Handle 'all' selectedAgeRange
@@ -69,13 +65,40 @@ const AgeBarChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
     return acc;
   }, {});
 
+  // Calculate total number of patients
+  const totalPatients = filteredData.length;
+
+  // If no patients are filtered, prevent division by zero by returning empty percentages
+  if (totalPatients === 0) {
+    return (
+      <Card>
+        <CardContent>
+          <Typography
+            variant="h6"
+            component="div"
+            gutterBottom
+            align="center"
+            color="textSecondary"
+          >
+            No patients available for the selected filters.
+          </Typography>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Calculate percentage for each age range
+  const agePercentages = ageRanges.map(
+    (range) => ((ageCounts[range] || 0) / totalPatients) * 100
+  );
+
   // Chart data and configuration
   const chartData = {
     labels: ageRanges,
     datasets: [
       {
-        label: "Number of Patients",
-        data: ageRanges.map((range) => ageCounts[range] || 0), // Handle missing age range counts
+        label: "Percentage of Patients",
+        data: agePercentages, // Use percentage data instead of raw counts
         backgroundColor: "#205260",
         hoverBackgroundColor: "#205260",
         borderColor: "#205260",
@@ -99,37 +122,43 @@ const AgeBarChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
       },
       y: {
         title: {
+           callback: function (value) {
+            if (value === 0) {
+              return ''; // Hide zero values on the y-axis
+            }
+            return value + '%'; // Add percentage sign to ticks
+          },
+          
           display: true,
-          text: "Number of Patients",
+          text: "Percentage of Patients",
         },
         beginAtZero: true,
         grid: {
           display: false, // Disable gridlines on y-axis
         },
       },
-      
     },
     plugins: {
       legend: {
-        position: "top",
+        position: "bottom",
       },
       datalabels: {
         display: (context) => context.dataset.data[context.dataIndex] !== 0, // Hide labels with zero values
-        color: 'gray', // Set label color to white
-        align: 'end', // Align data labels in the end of the doughnut slices
+        color: 'gray', // Set label color to gray
+        align: 'end', // Align data labels in the end of the bars
         anchor: 'end', // Anchor labels to the top of the bars
         font: {
           weight: 'bold',
           size: 14, // Set the font size
         },
-        formatter: (value) => value !== 0 ? value : '', // Display the count value
+        formatter: (value) => `${value.toFixed(2)}%`, // Display percentage with two decimal places
       },
       tooltip: {
         enabled: true, // Tooltip will display the value when hovering
         callbacks: {
-          // Custom tooltip to show the value when hovering
+          // Custom tooltip to show the percentage when hovering
           label: function (tooltipItem) {
-            return tooltipItem.raw; // Show the raw value
+            return `${tooltipItem.raw.toFixed(2)}%`; // Show the percentage in tooltip
           },
         },
       },
@@ -148,7 +177,7 @@ const AgeBarChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
           align="center"
           color="textSecondary"
         >
-          Patient Count by Age Range
+          Patient Percentage by Age Range
         </Typography>
         <div className="chartcard" style={{ height: 400 }}>
           <Bar data={chartData} options={chartOptions} />

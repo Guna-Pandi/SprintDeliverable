@@ -67,11 +67,17 @@ const DiagnosisStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }) =>
     const labels = Object.keys(diagnosisCounts);
     const diagnosisTypes = ["coronary artery disease", "hypertension", "stroke", "other"];
 
-    setChartData({
-      labels: labels,
-      datasets: diagnosisTypes.map((diagnosis) => ({
+    // Calculate percentages for each diagnosis per BP category
+    const datasets = diagnosisTypes.map((diagnosis) => {
+      const data = labels.map((label) => {
+        const count = diagnosisCounts[label]?.[diagnosis] || 0;
+        const total = Object.values(diagnosisCounts[label] || {}).reduce((sum, val) => sum + val, 0);
+        return total > 0 ? ((count / total) * 100).toFixed(2) : 0; // Calculate percentage
+      });
+
+      return {
         label: diagnosis,
-        data: labels.map((label) => diagnosisCounts[label]?.[diagnosis] || 0),
+        data,
         backgroundColor:
           diagnosis === "coronary artery disease"
             ? "#205260"
@@ -80,7 +86,12 @@ const DiagnosisStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }) =>
             : diagnosis === "stroke"
             ? "#cc464c"
             : "#e8993c",
-      })),
+      };
+    });
+
+    setChartData({
+      labels: labels,
+      datasets: datasets,
     });
   }, [data, selectedAgeRange, selectedDiagnosis]); // Re-run the effect when filters or data change
 
@@ -100,7 +111,7 @@ const DiagnosisStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }) =>
       y: {
         title: {
           display: true,
-          text: "Number of Patients",
+          text: "Percentage of Patients",
         },
         beginAtZero: true,
         grid: {
@@ -110,25 +121,25 @@ const DiagnosisStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }) =>
     },
     plugins: {
       legend: {
-        position: "top",
+        position: "bottom",
       },
       datalabels: {
         display: (context) => context.dataset.data[context.dataIndex] !== 0, // Hide labels with zero values
-        color: 'gray', // Set label color to white
-        align: 'end', // Align data labels in the end of the doughnut slices
+        color: 'gray', // Set label color to gray
+        align: 'end', // Align data labels at the end of the bars
         anchor: 'end', // Anchor labels to the top of the bars
         font: {
           weight: 'bold',
-          size: 14, // Set the font size
+          size: 10, // Reduced font size to avoid overlap
         },
-        formatter: (value) => value !== 0 ? value : '', // Display the count value
+        formatter: (value) => `${value}%`, // Display percentage with the "%" sign
       },
       tooltip: {
         enabled: true, // Tooltip will display the value when hovering
         callbacks: {
-          // Custom tooltip to show the value when hovering
+          // Custom tooltip to show the percentage when hovering
           label: function (tooltipItem) {
-            return tooltipItem.raw; // Show the raw value
+            return `${tooltipItem.raw}%`; // Show the percentage in tooltip
           },
         },
       },
@@ -141,7 +152,7 @@ const DiagnosisStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }) =>
     <Card>
       <CardContent>
         <Typography variant="h6" component="div" gutterBottom align="center" color="textSecondary">
-          Diagnosis Count by Systolic BP
+          Diagnosis Percentage by Systolic BP
         </Typography>
         <div className="chartcard" style={{ height: 400 }}>
           <Bar data={chartData} options={chartOptions} />

@@ -39,12 +39,15 @@ const DoughnutChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
       return acc;
     }, {});
 
-    // Prepare chart data
+    // Calculate total number of patients for percentage calculation
+    const totalPatients = filteredData.length;
+
+    // Prepare chart data with percentages
     setChartData({
       labels: Object.keys(diagnosisCount),
       datasets: [
         {
-          data: Object.values(diagnosisCount),
+          data: Object.values(diagnosisCount).map(count => (count / totalPatients) * 100), // Calculate percentage
           backgroundColor: ["#205260", "#fabf8d", "#cc464c", "#e8993c"],
           hoverBackgroundColor: ["#205260", "#fabf8d", "#cc464c", "#e8993c"],
         },
@@ -55,19 +58,22 @@ const DoughnutChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
   const options = {
     maintainAspectRatio: false,
     plugins: {
+      legend: {
+        position:"bottom",
+      },
       tooltip: {
         enabled: false, // Disable tooltips
       },
       datalabels: {
         display: (context) => context.dataset.data[context.dataIndex] !== 0, // Hide labels with zero values
-        color: 'gray', // Set label color to black
+        color: 'gray', // Set label color to gray
         align: 'start', // Align data labels outside the doughnut
         anchor: 'start', // Position labels outside of the doughnut
         font: {
           weight: 'bold',
-          size: 14, // Set the font size
+          size: 12, // Set the font size
         },
-        formatter: (value) => value !== 0 ? value : '', // Display the count value, hide zero
+        formatter: (value) => `${value.toFixed(2)}%`, // Display percentage with 2 decimal places
         offset: 15, // Move the labels slightly outside the doughnut
       },
     },
@@ -90,7 +96,7 @@ const DoughnutChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
           align="center"
           color="textSecondary"
         >
-          Patient Count by Diagnosis
+          Patient Percentage by Diagnosis
         </Typography>
         <div className="chartcard" style={{ height: 400 }}>
           <Doughnut data={chartData} options={options} />

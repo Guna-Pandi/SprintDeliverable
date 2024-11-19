@@ -61,14 +61,22 @@ const SmokingStatusStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }
     const smokingStatuses = ["non-smoker", "occasional smoker", "regular smoker"];
     const diagnosisTypes = ["coronary artery disease", "hypertension", "stroke", "other"];
 
-    // Prepare chart data with non-stacked bar configuration
+    // Calculate total number of patients for each smoking status
+    const smokingStatusTotalCounts = smokingStatuses.reduce((acc, status) => {
+      acc[status] = filteredData.filter((patient) => patient.smoking_status === status).length;
+      return acc;
+    }, {});
+
+    // Prepare chart data with percentages
     const newChartData = {
       labels: smokingStatuses,
       datasets: diagnosisTypes.map((diagnosis) => ({
         label: diagnosis,
-        data: smokingStatuses.map(
-          (status) => smokingStatusCounts[status]?.[diagnosis] || 0
-        ),
+        data: smokingStatuses.map((status) => {
+          const count = smokingStatusCounts[status]?.[diagnosis] || 0;
+          const total = smokingStatusTotalCounts[status] || 1; // Avoid division by zero
+          return (count / total) * 100; // Calculate percentage
+        }),
         backgroundColor:
           diagnosis === "coronary artery disease"
             ? "#205260"
@@ -100,7 +108,7 @@ const SmokingStatusStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }
       y: {
         title: {
           display: true,
-          text: "Number of Patients",
+          text: "Percentage",
         },
         stacked: false, // Disable stacking on the y-axis
         beginAtZero: true,
@@ -113,25 +121,29 @@ const SmokingStatusStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }
             if (value === 0) {
               return ''; // Hide zero values on the y-axis
             }
-            return value;
+            return value + '%'; // Add percentage sign to ticks
           },
         },
       },
     },
     plugins: {
       legend: {
-        position: "top",
+        position:"bottom",
       },
       datalabels: {
-        display: (context) => context.dataset.data[context.dataIndex] !== 0, // Hide labels with zero values
+        display: (context) => {
+          const value = context.dataset.data[context.dataIndex];
+          return value > 1; // Only show labels for values > 1%
+        },
         color: 'gray', // Set label color to black
         align: 'end', // Align labels to the top of the bars
         anchor: 'end', // Anchor labels to the top of the bars
         font: {
           weight: 'bold',
-          size: 11.5, // Set the font size
+          size: 10, // Further reduce font size
         },
-        formatter: (value) => value !== 0 ? value : '', // Display the count value, hide zero
+        offset: 10, // Offset the labels further to avoid overlap
+        formatter: (value) => value !== 0 ? `${value.toFixed(1)}%` : '', // Show percentage with 1 decimal place
       },
     },
     indexAxis: "x", // Bar chart on the x-axis

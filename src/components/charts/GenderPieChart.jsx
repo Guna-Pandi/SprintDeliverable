@@ -38,12 +38,15 @@ const GenderPieChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
       return acc;
     }, {});
 
-    // Prepare chart data
+    // Calculate the total number of patients for percentage calculation
+    const totalPatients = filteredData.length;
+
+    // Prepare chart data with percentages
     setChartData({
       labels: Object.keys(genderCounts),
       datasets: [
         {
-          data: Object.values(genderCounts),
+          data: Object.values(genderCounts).map(count => (count / totalPatients) * 100), // Calculate percentage
           backgroundColor: ["#205260", "#fabf8d", "#cc464c"], // Adjust colors as needed
           hoverBackgroundColor: ["#205260", "#fabf8d", "#cc464c"], // Adjust hover colors
         },
@@ -54,6 +57,9 @@ const GenderPieChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
   const options = {
     maintainAspectRatio: false,
     plugins: {
+      legend: {
+        position:"bottom",
+      },
       tooltip: {
         enabled: false, // Disable tooltips
       },
@@ -65,7 +71,7 @@ const GenderPieChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
           weight: 'bold',
           size: 14, // Set the font size
         },
-        formatter: (value) => value !== 0 ? value : '', // Display the count value, hide zero
+        formatter: (value) => `${value.toFixed(2)}%`, // Display percentage with 2 decimal places
       },
     },
     responsive: true,

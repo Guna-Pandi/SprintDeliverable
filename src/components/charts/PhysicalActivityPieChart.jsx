@@ -40,7 +40,7 @@ const DoughnutChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
     // Filter the data based on selected age range and diagnosis
     const filteredData = filterData();
 
-    // Calculate diagnosis count by physical activity
+    // Calculate physical activity counts for the filtered data
     const physicalActivityCounts = filteredData.reduce((acc, patient) => {
       const { physical_activity: physicalActivity } = patient;
       if (!acc[physicalActivity]) acc[physicalActivity] = 0;
@@ -48,17 +48,20 @@ const DoughnutChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
       return acc;
     }, {});
 
+    // Calculate the total number of patients for percentage calculation
+    const totalPatients = filteredData.length;
+
     // Define physical activity types
     const physicalActivities = Object.keys(physicalActivityCounts);
 
-    // Prepare chart data
+    // Prepare chart data with percentages
     const newChartData = {
       labels: physicalActivities,
       datasets: [
         {
           label: "Physical Activity",
           data: physicalActivities.map(
-            (activity) => physicalActivityCounts[activity] || 0
+            (activity) => (physicalActivityCounts[activity] / totalPatients) * 100 // Calculate percentage
           ),
           backgroundColor: ["#205260", "#fabf8d", "#cc464c", "#e8993c"],
           hoverBackgroundColor: ["#205260", "#fabf8d", "#cc464c", "#e8993c"],
@@ -72,19 +75,22 @@ const DoughnutChart = ({ data, selectedAgeRange, selectedDiagnosis }) => {
   const options = {
     maintainAspectRatio: false,
     plugins: {
+      legend: {
+        position:"bottom",
+      },
       tooltip: {
         enabled: false, // Disable tooltips
       },
       datalabels: {
         display: (context) => context.dataset.data[context.dataIndex] !== 0, // Hide labels with zero values
         color: 'gray', // Set label color to white
-        align: 'start', // Align data labels in the center of the doughnut slices
+        align: 'start', // Align data labels outside the doughnut
         anchor: 'start', // Position labels outside of the doughnut
         font: {
           weight: 'bold',
-          size: 14, // Set the font size
+          size: 12, // Set the font size to be smaller to avoid overlap
         },
-        formatter: (value) => value !== 0 ? value : '', // Display the count value
+        formatter: (value) => `${value.toFixed(2)}%`, // Display percentage with 2 decimal places
       },
     },
     responsive: true,
