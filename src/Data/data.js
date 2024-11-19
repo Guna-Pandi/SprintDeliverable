@@ -1,4 +1,4 @@
-import Heart from "../assets/Heart.png";
+import Heart from "../assets/cvdimage1.jpg";
 import Dashboard from "../assets/Dashboard.png";
 
 const cvd = [

@@ -10,11 +10,11 @@ const Home = ({ endpoint = [] }) => {
       {endpoint.map(({ id, heading, title, text, img, btn, linkpath }) => (
         <div
           key={id}
-          className={`flex items-center mt-20 lg:mt-24 mb-10 justify-between lg:flex-col-reverse lg:justify-center nike-container ${
+          className={`flex items-center mt-28 lg:mt-24 mb-10 justify-between lg:flex-col-reverse lg:justify-center nike-container ${
             id % 2 === 0 ? "flex-row-reverse" : "flex-row"
           }`}
         >
-          <div className="max-w-lg lg:max-h-none w-full mt-5 md:text-center grid items-center lg:justify-items-center pb-4">
+          <div className="max-w-lg lg:max-h-none w-full mt-5 ml-5 mr-5 md:text-center grid items-center lg:justify-items-center pb-4">
             <h1 className="text-4xl md:text-3xl font-bold text-gradient">
               {heading}
             </h1>
