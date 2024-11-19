@@ -102,9 +102,12 @@ const Predictor = () => {
     ];
 
     try {
-      const response = await axios.post("https://sprintdeliverablebackend-1.onrender.com/predict", {
-        input: inputArray,
-      });
+      const response = await axios.post(
+        "https://sprintdeliverablebackend-1.onrender.com/predict",
+        {
+          input: inputArray,
+        }
+      );
 
       if (response.data.prediction) {
         setResult(`Risk Category: ${response.data.prediction}`);
@@ -231,7 +234,9 @@ const Predictor = () => {
                 <span className="font-bold text-gray-700">Risk Category:</span>{" "}
                 <span
                   className={
-                    result.includes("High Risk")
+                    result.includes(
+                      "You have high risk of CVD ADVICE: Please consult your Cardiologist for a comprehensive evaluation"
+                    )
                       ? "text-red-600"
                       : "text-green-600"
                   }
