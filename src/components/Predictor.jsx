@@ -21,6 +21,7 @@ const Predictor = () => {
   });
 
   const [result, setResult] = useState("");
+  const [advice, setAdvice] = useState(""); // State to store personalized advice
   const [errorMessage, setErrorMessage] = useState("");
   const [showModal, setShowModal] = useState(false);
 
@@ -83,6 +84,7 @@ const Predictor = () => {
     e.preventDefault();
     setErrorMessage("");
     setResult("");
+    setAdvice(""); // Clear the advice on form submit
 
     let smokeNumeric = 0;
     if (inputs.smoke === "Occasional") smokeNumeric = 1;
@@ -102,15 +104,13 @@ const Predictor = () => {
     ];
 
     try {
-      const response = await axios.post(
-        "https://sprintdeliverablebackend-1.onrender.com/predict",
-        {
-          input: inputArray,
-        }
-      );
+      const response = await axios.post("http://127.0.0.1:5000/predict", {
+        input: inputArray,
+      });
 
       if (response.data.prediction) {
         setResult(`Risk Category: ${response.data.prediction}`);
+        setAdvice(response.data.advice); // Set personalized advice from the backend
         setFormData(inputs);
       } else {
         setErrorMessage("Error: Could not get a prediction from the server.");
@@ -134,10 +134,30 @@ const Predictor = () => {
     );
   });
 
+  const handleClear = () => {
+    setInputs({
+      sbp: "",
+      ldl: "",
+      dbp: "",
+      tgc: "",
+      tc: "",
+      bs: "",
+      hdl: "",
+      bmi: "",
+      smoke: "",
+      heart_rate: "",
+    });
+    setResult("");
+    setAdvice("");
+    setErrorMessage("");
+    setValidationErrors({});
+  };
+
   const closeModal = () => {
     setShowModal(false);
     setResult("");
     setErrorMessage("");
+    setAdvice(""); // Clear the advice when closing the modal
   };
 
   return (
@@ -210,7 +230,7 @@ const Predictor = () => {
                 </div>
               ))}
             </div>
-            <div className="flex justify-center">
+            <div className="flex justify-center space-x-4">
               <button
                 type="submit"
                 className={`text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-1/2 flex justify-center items-center px-5 py-2.5 ${
@@ -220,25 +240,33 @@ const Predictor = () => {
               >
                 Predict
               </button>
+
+              {/* Clear Button */}
+              <button
+                type="button"
+                onClick={handleClear}
+                className="text-gray-700 bg-gray-300 hover:bg-gray-400 focus:ring-4 focus:outline-none focus:ring-gray-200 font-medium rounded-lg text-sm w-1/2 flex justify-center items-center px-5 py-2.5"
+              >
+                Clear
+              </button>
             </div>
           </form>
         </div>
       </div>
 
       {showModal && (
-        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Result</h2>
+        <div className="fixed top-0  left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full ">
+            <h2 className="text-2xl font-bold flex justify-center items-center text-gray-900 mb-4">Result</h2>
+
             {result && (
               <p>
                 <span className="font-bold text-gray-700">Risk Category:</span>{" "}
                 <span
                   className={
-                    result.includes(
-                      "You have high risk of CVD ADVICE: Please consult your Cardiologist for a comprehensive evaluation"
-                    )
-                      ? "text-red-600"
-                      : "text-green-600"
+                    result.includes("High Risk")
+                      ? "text-red-600" // Apply red text for high risk
+                      : "text-green-600" // Apply green text for low risk
                   }
                 >
                   {result.replace("Risk Category:", "").trim()}
@@ -246,7 +274,17 @@ const Predictor = () => {
               </p>
             )}
 
+            {advice && (
+              <p className="mt-4">
+                <span className="font-bold text-gray-700">
+                  Personalized Advice:
+                </span>{" "}
+                {advice}
+              </p>
+            )}
+
             {errorMessage && <p className="text-red-600">{errorMessage}</p>}
+
             <button
               onClick={closeModal}
               className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
