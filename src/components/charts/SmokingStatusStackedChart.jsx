@@ -121,7 +121,7 @@ const SmokingStatusStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }
             if (value === 0) {
               return ''; // Hide zero values on the y-axis
             }
-            return value + '%'; // Add percentage sign to ticks
+            return value; // Add percentage sign to ticks
           },
         },
       },
@@ -142,7 +142,7 @@ const SmokingStatusStackedChart = ({ data, selectedAgeRange, selectedDiagnosis }
           weight: 'bold',
           size: 10, // Further reduce font size
         },
-        offset: 10, // Offset the labels further to avoid overlap
+        offset: 10, // Offst the labels further to avoid overlap
         formatter: (value) => value !== 0 ? `${value.toFixed(1)}%` : '', // Show percentage with 1 decimal place
       },
     },
